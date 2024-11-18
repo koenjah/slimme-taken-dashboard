@@ -32,4 +32,6 @@ export interface TimeEntry {
   date: string;
   description: string;
   created_at: string;
+  tasks?: { name: string };
+  subtasks?: { name: string };
 }
