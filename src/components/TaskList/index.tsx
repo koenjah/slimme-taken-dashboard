@@ -52,7 +52,6 @@ const TaskList = () => {
     const [removed] = newTasks.splice(sourceIndex, 1);
     newTasks.splice(destIndex, 0, removed);
 
-    // Update priority scores
     const updates = newTasks.map((task, index) => ({
       id: task.id,
       priority_score: newTasks.length - index,
