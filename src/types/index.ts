@@ -26,7 +26,7 @@ export interface Subtask {
 
 export interface TimeEntry {
   id: number;
-  task_id: number;
+  task_id: number | null;
   subtask_id: number | null;
   hours: number;
   date: string;
