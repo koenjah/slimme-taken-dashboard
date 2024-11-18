@@ -15,7 +15,7 @@ import TaskSubItem from "./TaskSubItem";
 interface TaskCardProps {
   task: Task;
   onTaskEdit: (task: Task) => void;
-  onSubtaskUpdate: (subtask: Partial<Subtask>) => void;
+  onSubtaskUpdate: (subtask: Partial<Subtask> & { id: number }) => void;
 }
 
 const getIcon = (iconName: string | null) => {

@@ -8,7 +8,7 @@ interface TaskSubItemProps {
   subtask: Subtask;
   taskId: number;
   index: number;
-  onSubtaskUpdate: (subtask: Partial<Subtask>) => void;
+  onSubtaskUpdate: (subtask: Partial<Subtask> & { id: number }) => void;
 }
 
 const TaskSubItem = ({ subtask, taskId, index, onSubtaskUpdate }: TaskSubItemProps) => {

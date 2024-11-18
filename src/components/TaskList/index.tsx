@@ -34,7 +34,7 @@ const TaskList = () => {
   });
 
   const updateTaskMutation = useMutation({
-    mutationFn: async (task: Partial<Task> & { name: string }) => {
+    mutationFn: async (task: Partial<Task> & { id: number; name: string }) => {
       const { error } = await supabase
         .from('tasks')
         .update(task)

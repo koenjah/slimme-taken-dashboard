@@ -1,10 +1,10 @@
 import { Card } from "@/components/ui/card";
 import TaskList from "@/components/TaskList";
 import TimeRegistration from "@/components/TimeRegistration";
-import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
 
 const Index = () => {
-  const { toast } = useToast();
+  const [isTimeRegistrationOpen, setIsTimeRegistrationOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#F3F3F3] py-8">
@@ -21,7 +21,10 @@ const Index = () => {
 
         <div className="grid gap-8">
           <TaskList />
-          <TimeRegistration />
+          <TimeRegistration 
+            open={isTimeRegistrationOpen}
+            onOpenChange={setIsTimeRegistrationOpen}
+          />
         </div>
       </div>
     </div>
