@@ -106,7 +106,7 @@ const TaskList = () => {
       <TaskForm
         open={isAddingTask}
         onOpenChange={setIsAddingTask}
-        onSubmit={(task) => createTaskMutation.mutate({ name: task.name || '', description: task.description, icon: task.icon })}
+        onSubmit={(task) => createTaskMutation.mutate(task)}
       />
 
       <TaskForm
