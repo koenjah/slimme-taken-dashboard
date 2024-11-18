@@ -17,7 +17,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
 export const createTask = async (task: { name: string } & Partial<Omit<Task, 'id' | 'subtasks' | 'created_at'>>) => {
   const { error } = await supabase
     .from('tasks')
-    .insert([{
+    .insert({
       name: task.name,
       description: task.description || '',
       icon: task.icon || 'zap',
@@ -25,7 +25,7 @@ export const createTask = async (task: { name: string } & Partial<Omit<Task, 'id
       progress: task.progress || 0,
       completed: task.completed || false,
       due_date: task.due_date || null
-    }]);
+    });
   if (error) throw error;
 };
 
