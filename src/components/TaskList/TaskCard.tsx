@@ -31,26 +31,26 @@ const getIcon = (iconName: string | null) => {
 
 const TaskCard = ({ task, onTaskEdit, onSubtaskUpdate }: TaskCardProps) => {
   return (
-    <Card className="w-full animate-fade-in border-l-4 border-l-primary bg-white/50 backdrop-blur-sm hover-scale">
+    <Card className="w-full animate-fade-in border-l-4 border-l-[#154273] bg-white backdrop-blur-sm hover:shadow-lg transition-all duration-200">
       <CardHeader className="flex flex-row items-center space-x-4">
-        <div className="text-gray-400 hover:text-primary transition-colors">
+        <div className="text-gray-400 hover:text-[#154273] transition-colors">
           <GripVertical className="h-5 w-5" />
         </div>
-        <div className="text-primary">
+        <div className="text-[#154273]">
           {getIcon(task.icon)}
         </div>
         <div className="flex-1">
-          <CardTitle className="text-lg font-bold text-primary font-title">
+          <CardTitle className="text-lg font-bold text-[#154273] font-poppins">
             {task.name}
           </CardTitle>
-          <p className="text-sm text-gray-500">{task.description}</p>
+          <p className="text-sm text-gray-500 font-inter">{task.description}</p>
         </div>
-        <div className="text-2xl font-bold text-primary font-title">
+        <div className="text-2xl font-bold text-[#154273] font-poppins">
           {task.progress}%
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="hover:text-primary transition-colors">
+            <Button variant="ghost" size="icon" className="hover:text-[#154273] transition-colors">
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

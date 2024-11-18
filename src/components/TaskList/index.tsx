@@ -1,13 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Task } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { DragDropContext, Draggable } from "react-beautiful-dnd";
 import { useState } from "react";
-import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import TaskForm from "../TaskForm";
 import TaskCard from "./TaskCard";
+import TaskHeader from "./TaskHeader";
 
 const fetchTasks = async (): Promise<Task[]> => {
   const { data, error } = await supabase
@@ -34,7 +33,7 @@ const TaskList = () => {
   });
 
   const updateTaskMutation = useMutation({
-    mutationFn: async (task: Partial<Task> & { id: number; name?: string }) => {
+    mutationFn: async (task: Partial<Task> & { id: number }) => {
       const { error } = await supabase
         .from('tasks')
         .update(task)
@@ -51,7 +50,7 @@ const TaskList = () => {
   });
 
   const createTaskMutation = useMutation({
-    mutationFn: async (task: Partial<Task> & { name: string }) => {
+    mutationFn: async (task: { name: string; description?: string; icon?: string }) => {
       const { error } = await supabase
         .from('tasks')
         .insert([task]);
@@ -87,20 +86,11 @@ const TaskList = () => {
     }
   };
 
-  if (isLoading) return <div className="animate-pulse">Taken Laden...</div>;
+  if (isLoading) return <div className="animate-pulse font-inter">Taken Laden...</div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold text-primary font-title">Taken</h2>
-        <Button 
-          onClick={() => setIsAddingTask(true)} 
-          className="bg-primary hover:bg-primary/90 button-hover"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Nieuwe Taak
-        </Button>
-      </div>
+      <TaskHeader onAddTask={() => setIsAddingTask(true)} />
 
       <DragDropContext onDragEnd={handleTaskDragEnd}>
         <div>
