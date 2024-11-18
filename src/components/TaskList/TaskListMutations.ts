@@ -14,21 +14,32 @@ export const fetchTasks = async (): Promise<Task[]> => {
   return data || [];
 };
 
-export const createTask = async (task: { name: string } & Partial<Omit<Task, 'id' | 'subtasks'>>) => {
+type CreateTaskInput = {
+  name: string;
+  description?: string;
+  icon?: string;
+  priority_score?: number;
+  progress?: number;
+  completed?: boolean;
+  due_date?: string | null;
+};
+
+export const createTask = async (task: CreateTaskInput) => {
   const { error } = await supabase
     .from('tasks')
-    .insert([{ 
+    .insert([{
       name: task.name,
       description: task.description || '',
       icon: task.icon || 'zap',
       priority_score: task.priority_score || 1,
       progress: task.progress || 0,
-      completed: task.completed || false
+      completed: task.completed || false,
+      due_date: task.due_date || null
     }]);
   if (error) throw error;
 };
 
-export const updateTask = async (task: { id: number } & Partial<Omit<Task, 'subtasks'>>) => {
+export const updateTask = async (task: { id: number } & Partial<Omit<Task, 'subtasks' | 'created_at'>>) => {
   const { error } = await supabase
     .from('tasks')
     .update(task)

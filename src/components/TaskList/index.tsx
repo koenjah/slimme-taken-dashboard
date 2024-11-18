@@ -107,7 +107,11 @@ const TaskList = () => {
         onOpenChange={setIsAddingTask}
         onSubmit={(task) => {
           if (task.name) {
-            createTaskMutation.mutate(task);
+            createTaskMutation.mutate({
+              name: task.name,
+              description: task.description,
+              icon: task.icon,
+            });
           }
         }}
       />
@@ -118,7 +122,10 @@ const TaskList = () => {
         onOpenChange={(open) => !open && setEditingTask(null)}
         onSubmit={(task) => {
           if (editingTask && task.name) {
-            updateTaskMutation.mutate({ ...task, id: editingTask.id });
+            updateTaskMutation.mutate({
+              ...task,
+              id: editingTask.id,
+            });
           }
         }}
       />
