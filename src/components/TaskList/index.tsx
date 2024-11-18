@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Task } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -7,7 +8,19 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TaskForm from "../TaskForm";
 import TaskCard from "./TaskCard";
-import { fetchTasks, updateTask, createTask } from "./TaskListMutations";
+
+const fetchTasks = async (): Promise<Task[]> => {
+  const { data, error } = await supabase
+    .from('tasks')
+    .select(`
+      *,
+      subtasks (*)
+    `)
+    .order('priority_score', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
 
 const TaskList = () => {
   const { toast } = useToast();
@@ -21,7 +34,13 @@ const TaskList = () => {
   });
 
   const updateTaskMutation = useMutation({
-    mutationFn: updateTask,
+    mutationFn: async (task: { id: number } & Partial<Task>) => {
+      const { error } = await supabase
+        .from('tasks')
+        .update(task)
+        .eq('id', task.id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
@@ -32,7 +51,12 @@ const TaskList = () => {
   });
 
   const createTaskMutation = useMutation({
-    mutationFn: createTask,
+    mutationFn: async (task: { name: string; description?: string; icon?: string }) => {
+      const { error } = await supabase
+        .from('tasks')
+        .insert([task]);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
@@ -63,13 +87,13 @@ const TaskList = () => {
     }
   };
 
-  if (isLoading) return <div className="animate-pulse font-inter">Taken Laden...</div>;
+  if (isLoading) return <div className="animate-pulse">Taken Laden...</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold font-poppins text-[#154273]">Taken</h2>
-        <Button onClick={() => setIsAddingTask(true)} className="bg-[#154273] hover:bg-[#154273]/90">
+        <h2 className="text-2xl font-semibold text-primary">Taken</h2>
+        <Button onClick={() => setIsAddingTask(true)} className="bg-primary hover:bg-primary/90">
           <Plus className="h-4 w-4 mr-2" />
           Nieuwe Taak
         </Button>
@@ -85,11 +109,11 @@ const TaskList = () => {
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      {...provided.dragHandleProps}
                       className="mb-4"
                     >
                       <TaskCard
                         task={task}
+                        dragHandleProps={provided.dragHandleProps}
                         onTaskEdit={setEditingTask}
                         onSubtaskUpdate={updateTaskMutation.mutate}
                       />
