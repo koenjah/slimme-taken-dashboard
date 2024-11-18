@@ -1,25 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Task } from "@/types";
-import { supabase } from "@/integrations/supabase/client";
-import { DragDropContext, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import TaskForm from "../TaskForm";
 import TaskCard from "./TaskCard";
-import TaskHeader from "./TaskHeader";
-
-const fetchTasks = async (): Promise<Task[]> => {
-  const { data, error } = await supabase
-    .from('tasks')
-    .select(`
-      *,
-      subtasks (*)
-    `)
-    .order('priority_score', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
-};
+import { fetchTasks, updateTask, createTask } from "./TaskListMutations";
 
 const TaskList = () => {
   const { toast } = useToast();
@@ -33,13 +21,7 @@ const TaskList = () => {
   });
 
   const updateTaskMutation = useMutation({
-    mutationFn: async (task: Partial<Task> & { id: number }) => {
-      const { error } = await supabase
-        .from('tasks')
-        .update(task)
-        .eq('id', task.id);
-      if (error) throw error;
-    },
+    mutationFn: updateTask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
@@ -50,12 +32,7 @@ const TaskList = () => {
   });
 
   const createTaskMutation = useMutation({
-    mutationFn: async (task: { name: string; description?: string; icon?: string }) => {
-      const { error } = await supabase
-        .from('tasks')
-        .insert([task]);
-      if (error) throw error;
-    },
+    mutationFn: createTask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
@@ -75,9 +52,9 @@ const TaskList = () => {
     const [removed] = newTasks.splice(sourceIndex, 1);
     newTasks.splice(destIndex, 0, removed);
 
+    // Update priority scores
     const updates = newTasks.map((task, index) => ({
       id: task.id,
-      name: task.name,
       priority_score: newTasks.length - index,
     }));
 
@@ -90,35 +67,46 @@ const TaskList = () => {
 
   return (
     <div className="space-y-6">
-      <TaskHeader onAddTask={() => setIsAddingTask(true)} />
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold font-poppins text-[#154273]">Taken</h2>
+        <Button onClick={() => setIsAddingTask(true)} className="bg-[#154273] hover:bg-[#154273]/90">
+          <Plus className="h-4 w-4 mr-2" />
+          Nieuwe Taak
+        </Button>
+      </div>
 
       <DragDropContext onDragEnd={handleTaskDragEnd}>
-        <div>
-          {tasks?.map((task, index) => (
-            <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                  className="mb-4"
-                >
-                  <TaskCard
-                    task={task}
-                    onTaskEdit={setEditingTask}
-                    onSubtaskUpdate={updateTaskMutation.mutate}
-                  />
-                </div>
-              )}
-            </Draggable>
-          ))}
-        </div>
+        <Droppable droppableId="tasks">
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef}>
+              {tasks?.map((task, index) => (
+                <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      className="mb-4"
+                    >
+                      <TaskCard
+                        task={task}
+                        onTaskEdit={setEditingTask}
+                        onSubtaskUpdate={updateTaskMutation.mutate}
+                      />
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
       </DragDropContext>
 
       <TaskForm
         open={isAddingTask}
         onOpenChange={setIsAddingTask}
-        onSubmit={(task) => createTaskMutation.mutate({ ...task, name: task.name || '' })}
+        onSubmit={(task) => createTaskMutation.mutate({ name: task.name || '', description: task.description, icon: task.icon })}
       />
 
       <TaskForm
@@ -126,8 +114,8 @@ const TaskList = () => {
         open={!!editingTask}
         onOpenChange={(open) => !open && setEditingTask(null)}
         onSubmit={(task) => {
-          if (editingTask && task.name) {
-            updateTaskMutation.mutate({ ...task, id: editingTask.id, name: task.name });
+          if (editingTask) {
+            updateTaskMutation.mutate({ ...task, id: editingTask.id });
           }
         }}
       />
