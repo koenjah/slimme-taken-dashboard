@@ -15,7 +15,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
 };
 
 // Ensure name is required for task creation
-export const createTask = async (task: { name: string; description?: string; icon?: string }) => {
+export const createTask = async (task: { name: string } & Partial<Task>) => {
   const { error } = await supabase
     .from('tasks')
     .insert([task]);

@@ -1,6 +1,6 @@
 import { Subtask } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input"; // Add missing import
+import { Input } from "@/components/ui/input";
 import { GripVertical } from "lucide-react";
 import { Draggable } from "react-beautiful-dnd";
 
