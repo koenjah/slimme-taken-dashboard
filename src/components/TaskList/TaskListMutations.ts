@@ -14,17 +14,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
   return data || [];
 };
 
-type CreateTaskInput = {
-  name: string;
-  description?: string;
-  icon?: string;
-  priority_score?: number;
-  progress?: number;
-  completed?: boolean;
-  due_date?: string | null;
-};
-
-export const createTask = async (task: CreateTaskInput) => {
+export const createTask = async (task: { name: string } & Partial<Omit<Task, 'id' | 'subtasks' | 'created_at'>>) => {
   const { error } = await supabase
     .from('tasks')
     .insert([{
