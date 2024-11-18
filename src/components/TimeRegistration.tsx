@@ -1,61 +1,31 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { TimeEntry } from "@/types";
-import { supabase } from "@/integrations/supabase/client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit2, Trash2 } from "lucide-react";
+import { TimeEntry } from "@/types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import TimeEntryForm from "./TimeEntryForm";
 
-const fetchTimeEntries = async (): Promise<TimeEntry[]> => {
-  const { data, error } = await supabase
-    .from('time_entries')
-    .select(`
-      *,
-      tasks (name),
-      subtasks (name)
-    `)
-    .order('date', { ascending: false });
+interface TimeRegistrationProps {
+  entry?: TimeEntry;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
 
-  if (error) throw error;
-  return data || [];
-};
+const TimeRegistration = ({ entry, open, onOpenChange }: TimeRegistrationProps) => {
+  const [formData, setFormData] = useState({
+    task_id: entry?.task_id?.toString() || "",
+    subtask_id: entry?.subtask_id?.toString() || "",
+    hours: entry?.hours || 0,
+    description: entry?.description || "",
+    date: entry?.date ? new Date(entry.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+  });
 
-const TimeRegistration = () => {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [isAddingEntry, setIsAddingEntry] = useState(false);
-  const [editingEntry, setEditingEntry] = useState<TimeEntry | null>(null);
+  const { toast } = useToast();
 
-  const { data: entries, isLoading } = useQuery({
-    queryKey: ['timeEntries'],
-    queryFn: fetchTimeEntries,
-  });
-
-  const { data: tasks } = useQuery({
-    queryKey: ['tasks'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select(`
-          *,
-          subtasks (*)
-        `);
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  const createEntryMutation = useMutation({
+  const createTimeEntryMutation = useMutation({
     mutationFn: async (entry: Partial<TimeEntry> & { hours: number }) => {
       const { error } = await supabase
         .from('time_entries')
@@ -63,15 +33,15 @@ const TimeRegistration = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timeEntries'] });
+      queryClient.invalidateQueries({ queryKey: ['time_entries'] });
       toast({
-        title: "Tijdregistratie toegevoegd",
-        description: "De nieuwe tijdregistratie is succesvol aangemaakt.",
+        title: "Tijd geregistreerd",
+        description: "De tijd is succesvol geregistreerd.",
       });
     },
   });
 
-  const updateEntryMutation = useMutation({
+  const updateTimeEntryMutation = useMutation({
     mutationFn: async (entry: Partial<TimeEntry> & { hours: number }) => {
       const { error } = await supabase
         .from('time_entries')
@@ -80,111 +50,72 @@ const TimeRegistration = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timeEntries'] });
+      queryClient.invalidateQueries({ queryKey: ['time_entries'] });
       toast({
-        title: "Tijdregistratie bijgewerkt",
-        description: "De wijzigingen zijn succesvol opgeslagen.",
+        title: "Tijd bijgewerkt",
+        description: "De tijd is succesvol bijgewerkt.",
       });
     },
   });
 
-  const deleteEntryMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const { error } = await supabase
-        .from('time_entries')
-        .delete()
-        .eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timeEntries'] });
-      toast({
-        title: "Tijdregistratie verwijderd",
-        description: "De tijdregistratie is succesvol verwijderd.",
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (entry) {
+      updateTimeEntryMutation.mutate({
+        ...formData,
+        id: entry.id,
+        task_id: formData.task_id ? parseInt(formData.task_id) : null,
+        subtask_id: formData.subtask_id ? parseInt(formData.subtask_id) : null,
       });
-    },
-  });
-
-  if (isLoading) return <div className="animate-pulse">Tijdregistraties Laden...</div>;
+    } else {
+      createTimeEntryMutation.mutate({
+        ...formData,
+        hours: formData.hours,
+        task_id: formData.task_id ? parseInt(formData.task_id) : null,
+        subtask_id: formData.subtask_id ? parseInt(formData.subtask_id) : null,
+      });
+    }
+    onOpenChange(false);
+  };
 
   return (
-    <Card className="mt-8">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg font-bold text-primary">
-          Tijdregistratie
-        </CardTitle>
-        <Button onClick={() => setIsAddingEntry(true)} className="bg-primary hover:bg-primary/90">
-          <Plus className="h-4 w-4 mr-2" />
-          Nieuwe Registratie
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50/50">
-              <TableHead className="w-[30%]">Taak</TableHead>
-              <TableHead className="w-[30%]">Omschrijving</TableHead>
-              <TableHead className="text-center">Uren</TableHead>
-              <TableHead className="text-center">Datum</TableHead>
-              <TableHead className="text-right">Acties</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {entries?.map((entry) => (
-              <TableRow key={entry.id} className="hover:bg-gray-50/50">
-                <TableCell className="font-medium">
-                  {entry.tasks?.name || entry.subtasks?.name || 'Onbekende taak'}
-                </TableCell>
-                <TableCell>{entry.description}</TableCell>
-                <TableCell className="text-center">{entry.hours}</TableCell>
-                <TableCell className="text-center">
-                  {new Date(entry.date).toLocaleDateString('nl-NL')}
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setEditingEntry(entry)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => deleteEntryMutation.mutate(entry.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-
-      {tasks && (
-        <>
-          <TimeEntryForm
-            open={isAddingEntry}
-            onOpenChange={setIsAddingEntry}
-            tasks={tasks}
-            onSubmit={(entry) => createEntryMutation.mutate(entry)}
-          />
-
-          <TimeEntryForm
-            entry={editingEntry}
-            open={!!editingEntry}
-            onOpenChange={(open) => !open && setEditingEntry(null)}
-            tasks={tasks}
-            onSubmit={(entry) => {
-              if (editingEntry) {
-                updateEntryMutation.mutate({ ...entry, id: editingEntry.id });
-              }
-            }}
-          />
-        </>
-      )}
-    </Card>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{entry ? "Bewerk Tijd Registratie" : "Voeg Tijd Registratie Toe"}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Uren</label>
+            <Input
+              type="number"
+              step="0.25"
+              value={formData.hours}
+              onChange={(e) => setFormData({ ...formData, hours: parseFloat(e.target.value) })}
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Beschrijving</label>
+            <Input
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Beschrijving"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Datum</label>
+            <Input
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+            />
+          </div>
+          <Button type="submit" className="w-full">
+            {entry ? "Opslaan Wijzigingen" : "Tijd Registreren"}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

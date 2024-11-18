@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Task } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { DragDropContext, Draggable } from "react-beautiful-dnd";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -100,31 +100,26 @@ const TaskList = () => {
       </div>
 
       <DragDropContext onDragEnd={handleTaskDragEnd}>
-        <Droppable droppableId="tasks">
-          {(provided) => (
-            <div {...provided.droppableProps} ref={provided.innerRef}>
-              {tasks?.map((task, index) => (
-                <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      className="mb-4"
-                    >
-                      <TaskCard
-                        task={task}
-                        onTaskEdit={setEditingTask}
-                        onSubtaskUpdate={updateTaskMutation.mutate}
-                      />
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
+        <div>
+          {tasks?.map((task, index) => (
+            <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  className="mb-4"
+                >
+                  <TaskCard
+                    task={task}
+                    onTaskEdit={setEditingTask}
+                    onSubtaskUpdate={updateTaskMutation.mutate}
+                  />
+                </div>
+              )}
+            </Draggable>
+          ))}
+        </div>
       </DragDropContext>
 
       <TaskForm

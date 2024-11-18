@@ -14,7 +14,6 @@ interface TaskSubItemProps {
 const TaskSubItem = ({ subtask, taskId, index, onSubtaskUpdate }: TaskSubItemProps) => {
   return (
     <Draggable
-      key={subtask.id}
       draggableId={`${taskId}-${subtask.id}`}
       index={index}
     >
