@@ -75,8 +75,7 @@ const TaskList = () => {
             <div className="mb-4">
               <Progress 
                 value={task.progress} 
-                className="h-2"
-                className={getProgressColor(task.progress)}
+                className={`h-2 ${getProgressColor(task.progress)}`}
               />
             </div>
             <div className="space-y-3">
