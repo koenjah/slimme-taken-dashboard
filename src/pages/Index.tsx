@@ -11,7 +11,7 @@ const Index = () => {
       <div className="container max-w-6xl mx-auto px-4">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">AI Brigade</h1>
-          <p className="text-gray-600 mt-2">Werkzaamheden van voortgang</p>
+          <p className="text-gray-600 mt-2">Werkzaamheden en Voortgang</p>
         </header>
 
         <div className="grid gap-8">

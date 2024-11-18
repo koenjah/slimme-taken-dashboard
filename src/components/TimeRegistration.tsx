@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { TimeEntry } from "@/types";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Table,
   TableBody,
@@ -53,7 +53,7 @@ const TimeRegistration = () => {
             {entries?.map((entry, index) => (
               <TableRow key={entry.id} className={index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}>
                 <TableCell className="font-medium">
-                  {entry.task_id}
+                  {entry.tasks?.name || entry.subtasks?.name || 'Onbekende taak'}
                 </TableCell>
                 <TableCell className="text-center">{entry.hours}</TableCell>
                 <TableCell className="text-center">
