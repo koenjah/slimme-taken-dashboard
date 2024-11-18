@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Task } from "@/types";
-import { supabase } from "@/integrations/supabase/client";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -8,19 +7,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TaskForm from "../TaskForm";
 import TaskCard from "./TaskCard";
-
-const fetchTasks = async (): Promise<Task[]> => {
-  const { data, error } = await supabase
-    .from('tasks')
-    .select(`
-      *,
-      subtasks (*)
-    `)
-    .order('priority_score', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
-};
+import { fetchTasks, updateTask, createTask } from "./TaskListMutations";
 
 const TaskList = () => {
   const { toast } = useToast();
@@ -34,13 +21,7 @@ const TaskList = () => {
   });
 
   const updateTaskMutation = useMutation({
-    mutationFn: async (task: { id: number } & Partial<Task>) => {
-      const { error } = await supabase
-        .from('tasks')
-        .update(task)
-        .eq('id', task.id);
-      if (error) throw error;
-    },
+    mutationFn: updateTask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
@@ -51,12 +32,7 @@ const TaskList = () => {
   });
 
   const createTaskMutation = useMutation({
-    mutationFn: async (task: { name: string; description?: string; icon?: string }) => {
-      const { error } = await supabase
-        .from('tasks')
-        .insert([task]);
-      if (error) throw error;
-    },
+    mutationFn: createTask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({

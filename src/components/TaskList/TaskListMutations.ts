@@ -14,7 +14,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
   return data || [];
 };
 
-export const updateTask = async (task: { id: number } & Partial<Omit<Task, 'id'>>) => {
+export const updateTask = async (task: { id: number } & Partial<Task>) => {
   const { error } = await supabase
     .from('tasks')
     .update(task)
