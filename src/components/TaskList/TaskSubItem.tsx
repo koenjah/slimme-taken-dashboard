@@ -21,9 +21,9 @@ const TaskSubItem = ({ subtask, taskId, index, onSubtaskUpdate }: TaskSubItemPro
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          className="flex items-center space-x-3 p-2 bg-white/80 rounded-md shadow-sm border border-gray-100"
+          className="flex items-center space-x-3 p-2 bg-white rounded-md shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200"
         >
-          <div {...provided.dragHandleProps}>
+          <div {...provided.dragHandleProps} className="hover:text-primary transition-colors">
             <GripVertical className="h-4 w-4 text-gray-400" />
           </div>
           <Checkbox 
@@ -35,7 +35,7 @@ const TaskSubItem = ({ subtask, taskId, index, onSubtaskUpdate }: TaskSubItemPro
                 progress: checked ? 100 : 0,
               });
             }}
-            className="data-[state=checked]:bg-primary"
+            className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
           />
           <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
             {subtask.name}
@@ -51,7 +51,7 @@ const TaskSubItem = ({ subtask, taskId, index, onSubtaskUpdate }: TaskSubItemPro
                 completed: progress === 100,
               });
             }}
-            className="w-20 text-right"
+            className="w-20 text-right focus:ring-primary"
             min="0"
             max="100"
           />

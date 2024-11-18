@@ -26,15 +26,15 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#F8F9FA",
+        background: "#FAF8F4",
         foreground: "#1A1A1A",
         primary: {
-          DEFAULT: "#00466E",
+          DEFAULT: "#154273",
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#E17000",
-          foreground: "#FFFFFF",
+          DEFAULT: "#FFC723",
+          foreground: "#154273",
         },
         destructive: {
           DEFAULT: "#DC2626",
@@ -45,8 +45,8 @@ export default {
           foreground: "#64748B",
         },
         accent: {
-          DEFAULT: "#E17000",
-          foreground: "#FFFFFF",
+          DEFAULT: "#FFC723",
+          foreground: "#154273",
         },
         card: {
           DEFAULT: "#FFFFFF",
@@ -59,7 +59,22 @@ export default {
         sm: "0.25rem",
       },
       fontFamily: {
-        sans: ["RijksoverheidSans", "system-ui", "sans-serif"],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        title: ["Poppins", "system-ui", "sans-serif"],
+      },
+      keyframes: {
+        "subtle-bounce": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-2px)" },
+        },
+        "subtle-scale": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.02)" },
+        },
+      },
+      animation: {
+        "subtle-bounce": "subtle-bounce 0.3s ease-in-out",
+        "subtle-scale": "subtle-scale 0.3s ease-in-out",
       },
     },
   },

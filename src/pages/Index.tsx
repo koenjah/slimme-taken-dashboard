@@ -7,13 +7,13 @@ const Index = () => {
   const [isTimeRegistrationOpen, setIsTimeRegistrationOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#F3F3F3] py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="mb-8 bg-primary text-white p-6 rounded-lg shadow-lg">
+        <header className="mb-8 bg-primary text-white p-6 rounded-lg shadow-lg hover-scale">
           <div className="flex items-center gap-4">
             <img src="/rijksoverheid-logo.svg" alt="Rijksoverheid" className="h-12" />
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">AI Brigade Dashboard</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold font-title">AI Brigade Dashboard</h1>
               <p className="text-primary-foreground/80 mt-2">Werkzaamheden van Koen</p>
             </div>
           </div>

@@ -31,26 +31,26 @@ const getIcon = (iconName: string | null) => {
 
 const TaskCard = ({ task, onTaskEdit, onSubtaskUpdate }: TaskCardProps) => {
   return (
-    <Card className="w-full animate-fade-in border-l-4 border-l-primary bg-white/50 backdrop-blur-sm">
+    <Card className="w-full animate-fade-in border-l-4 border-l-primary bg-white/50 backdrop-blur-sm hover-scale">
       <CardHeader className="flex flex-row items-center space-x-4">
-        <div>
-          <GripVertical className="h-5 w-5 text-gray-400" />
+        <div className="text-gray-400 hover:text-primary transition-colors">
+          <GripVertical className="h-5 w-5" />
         </div>
         <div className="text-primary">
           {getIcon(task.icon)}
         </div>
         <div className="flex-1">
-          <CardTitle className="text-lg font-bold text-primary">
+          <CardTitle className="text-lg font-bold text-primary font-title">
             {task.name}
           </CardTitle>
           <p className="text-sm text-gray-500">{task.description}</p>
         </div>
-        <div className="text-2xl font-bold text-primary">
+        <div className="text-2xl font-bold text-primary font-title">
           {task.progress}%
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="hover:text-primary transition-colors">
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

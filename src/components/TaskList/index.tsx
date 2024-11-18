@@ -34,7 +34,7 @@ const TaskList = () => {
   });
 
   const updateTaskMutation = useMutation({
-    mutationFn: async (task: Partial<Task> & { id: number; name: string }) => {
+    mutationFn: async (task: Partial<Task> & { id: number; name?: string }) => {
       const { error } = await supabase
         .from('tasks')
         .update(task)
@@ -92,8 +92,11 @@ const TaskList = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold text-primary">Taken</h2>
-        <Button onClick={() => setIsAddingTask(true)} className="bg-primary hover:bg-primary/90">
+        <h2 className="text-2xl font-semibold text-primary font-title">Taken</h2>
+        <Button 
+          onClick={() => setIsAddingTask(true)} 
+          className="bg-primary hover:bg-primary/90 button-hover"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Nieuwe Taak
         </Button>

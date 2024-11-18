@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=RijksoverheidSans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,19 +12,19 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 215 75% 27%;
+    --primary: 211 69% 27%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 42 82% 57%;
-    --secondary-foreground: 215 75% 27%;
+    --secondary: 42 100% 57%;
+    --secondary-foreground: 211 69% 27%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 42 82% 57%;
-    --accent-foreground: 215 75% 27%;
+    --accent: 42 100% 57%;
+    --accent-foreground: 211 69% 27%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 215 75% 27%;
+    --ring: 211 69% 27%;
     --radius: 0.25rem;
   }
 }
@@ -34,13 +34,16 @@
     @apply border-border;
   }
   body {
-    @apply bg-[#F3F3F3] text-foreground font-sans;
+    @apply bg-background text-foreground font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-title font-semibold;
   }
 }
 
 .task-card {
-  @apply bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-4 transition-all duration-200 hover:shadow-md;
+  @apply bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-4 transition-all duration-200 hover:shadow-md hover:translate-y-[-2px];
 }
 
 .progress-bar {
@@ -52,9 +55,17 @@
 }
 
 .task-title {
-  @apply text-lg font-semibold mb-2;
+  @apply text-lg font-title font-semibold mb-2;
 }
 
 .subtask-item {
   @apply flex items-center gap-3 py-2 px-4 rounded-md hover:bg-gray-50 transition-colors;
+}
+
+.hover-scale {
+  @apply transition-transform duration-200 hover:scale-[1.02];
+}
+
+.button-hover {
+  @apply transition-all duration-200 hover:translate-y-[-1px] hover:shadow-md active:translate-y-[0px];
 }
