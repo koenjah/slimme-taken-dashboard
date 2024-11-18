@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Task, Subtask } from "@/types";
+import { Task } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
@@ -34,7 +34,7 @@ const TaskList = () => {
   });
 
   const updateTaskMutation = useMutation({
-    mutationFn: async (task: Partial<Task>) => {
+    mutationFn: async (task: Partial<Task> & { name: string }) => {
       const { error } = await supabase
         .from('tasks')
         .update(task)
@@ -51,10 +51,10 @@ const TaskList = () => {
   });
 
   const createTaskMutation = useMutation({
-    mutationFn: async (task: Partial<Task>) => {
+    mutationFn: async (task: Partial<Task> & { name: string }) => {
       const { error } = await supabase
         .from('tasks')
-        .insert([{ ...task, name: task.name || '' }]);
+        .insert([task]);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -78,31 +78,8 @@ const TaskList = () => {
 
     const updates = newTasks.map((task, index) => ({
       id: task.id,
+      name: task.name,
       priority_score: newTasks.length - index,
-    }));
-
-    for (const update of updates) {
-      await updateTaskMutation.mutateAsync(update);
-    }
-  };
-
-  const handleSubtaskDragEnd = async (result: any) => {
-    if (!result.destination) return;
-
-    const sourceIndex = result.source.index;
-    const destIndex = result.destination.index;
-    const [taskId, subtaskId] = result.draggableId.split('-').map(Number);
-
-    const task = tasks?.find(t => t.id === taskId);
-    if (!task) return;
-
-    const newSubtasks = Array.from(task.subtasks);
-    const [removed] = newSubtasks.splice(sourceIndex, 1);
-    newSubtasks.splice(destIndex, 0, removed);
-
-    const updates = newSubtasks.map((subtask, index) => ({
-      id: subtask.id,
-      priority_score: newSubtasks.length - index,
     }));
 
     for (const update of updates) {
@@ -137,7 +114,6 @@ const TaskList = () => {
                     >
                       <TaskCard
                         task={task}
-                        index={index}
                         onTaskEdit={setEditingTask}
                         onSubtaskUpdate={updateTaskMutation.mutate}
                       />
@@ -154,7 +130,7 @@ const TaskList = () => {
       <TaskForm
         open={isAddingTask}
         onOpenChange={setIsAddingTask}
-        onSubmit={(task) => createTaskMutation.mutate(task)}
+        onSubmit={(task) => createTaskMutation.mutate({ ...task, name: task.name || '' })}
       />
 
       <TaskForm
@@ -162,8 +138,8 @@ const TaskList = () => {
         open={!!editingTask}
         onOpenChange={(open) => !open && setEditingTask(null)}
         onSubmit={(task) => {
-          if (editingTask) {
-            updateTaskMutation.mutate({ ...task, id: editingTask.id });
+          if (editingTask && task.name) {
+            updateTaskMutation.mutate({ ...task, id: editingTask.id, name: task.name });
           }
         }}
       />

@@ -56,7 +56,7 @@ const TimeRegistration = () => {
   });
 
   const createEntryMutation = useMutation({
-    mutationFn: async (entry: Partial<TimeEntry>) => {
+    mutationFn: async (entry: Partial<TimeEntry> & { hours: number }) => {
       const { error } = await supabase
         .from('time_entries')
         .insert([entry]);
@@ -72,7 +72,7 @@ const TimeRegistration = () => {
   });
 
   const updateEntryMutation = useMutation({
-    mutationFn: async (entry: Partial<TimeEntry>) => {
+    mutationFn: async (entry: Partial<TimeEntry> & { hours: number }) => {
       const { error } = await supabase
         .from('time_entries')
         .update(entry)

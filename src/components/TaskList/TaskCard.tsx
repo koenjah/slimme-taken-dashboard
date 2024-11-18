@@ -1,8 +1,6 @@
 import { Task, Subtask } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PenTool, Settings, Zap, MoreVertical, Edit3, GripVertical } from "lucide-react";
 import {
@@ -11,11 +9,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { Droppable } from "react-beautiful-dnd";
+import TaskSubItem from "./TaskSubItem";
 
 interface TaskCardProps {
   task: Task;
-  index: number;
   onTaskEdit: (task: Task) => void;
   onSubtaskUpdate: (subtask: Partial<Subtask>) => void;
 }
@@ -31,7 +29,7 @@ const getIcon = (iconName: string | null) => {
   }
 };
 
-const TaskCard = ({ task, index, onTaskEdit, onSubtaskUpdate }: TaskCardProps) => {
+const TaskCard = ({ task, onTaskEdit, onSubtaskUpdate }: TaskCardProps) => {
   return (
     <Card className="w-full animate-fade-in border-l-4 border-l-primary bg-white/50 backdrop-blur-sm">
       <CardHeader className="flex flex-row items-center space-x-4">
@@ -81,52 +79,13 @@ const TaskCard = ({ task, index, onTaskEdit, onSubtaskUpdate }: TaskCardProps) =
               {task.subtasks
                 .filter(subtask => !subtask.archived)
                 .map((subtask, index) => (
-                  <Draggable
+                  <TaskSubItem
                     key={subtask.id}
-                    draggableId={`${task.id}-${subtask.id}`}
+                    subtask={subtask}
+                    taskId={task.id}
                     index={index}
-                  >
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        className="flex items-center space-x-3 p-2 bg-white/80 rounded-md shadow-sm border border-gray-100"
-                      >
-                        <div {...provided.dragHandleProps}>
-                          <GripVertical className="h-4 w-4 text-gray-400" />
-                        </div>
-                        <Checkbox 
-                          checked={subtask.completed}
-                          onCheckedChange={(checked) => {
-                            onSubtaskUpdate({
-                              id: subtask.id,
-                              completed: checked as boolean,
-                              progress: checked ? 100 : 0,
-                            });
-                          }}
-                          className="data-[state=checked]:bg-primary"
-                        />
-                        <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
-                          {subtask.name}
-                        </span>
-                        <Input
-                          type="number"
-                          value={subtask.progress}
-                          onChange={(e) => {
-                            const progress = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                            onSubtaskUpdate({
-                              id: subtask.id,
-                              progress,
-                              completed: progress === 100,
-                            });
-                          }}
-                          className="w-20 text-right"
-                          min="0"
-                          max="100"
-                        />
-                      </div>
-                    )}
-                  </Draggable>
+                    onSubtaskUpdate={onSubtaskUpdate}
+                  />
                 ))}
               {provided.placeholder}
             </div>
