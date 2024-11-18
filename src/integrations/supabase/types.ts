@@ -9,7 +9,134 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      subtasks: {
+        Row: {
+          archived: boolean | null
+          completed: boolean | null
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          id: number
+          name: string
+          priority_score: number | null
+          progress: number | null
+          task_id: number | null
+        }
+        Insert: {
+          archived?: boolean | null
+          completed?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: number
+          name: string
+          priority_score?: number | null
+          progress?: number | null
+          task_id?: number | null
+        }
+        Update: {
+          archived?: boolean | null
+          completed?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: number
+          name?: string
+          priority_score?: number | null
+          progress?: number | null
+          task_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subtasks_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          completed: boolean | null
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          icon: string | null
+          id: number
+          name: string
+          priority_score: number | null
+          progress: number | null
+        }
+        Insert: {
+          completed?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          icon?: string | null
+          id?: number
+          name: string
+          priority_score?: number | null
+          progress?: number | null
+        }
+        Update: {
+          completed?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          icon?: string | null
+          id?: number
+          name?: string
+          priority_score?: number | null
+          progress?: number | null
+        }
+        Relationships: []
+      }
+      time_entries: {
+        Row: {
+          created_at: string | null
+          date: string | null
+          description: string | null
+          hours: number
+          id: number
+          subtask_id: number | null
+          task_id: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          date?: string | null
+          description?: string | null
+          hours: number
+          id?: number
+          subtask_id?: number | null
+          task_id?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string | null
+          description?: string | null
+          hours?: number
+          id?: number
+          subtask_id?: number | null
+          task_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_entries_subtask_id_fkey"
+            columns: ["subtask_id"]
+            isOneToOne: false
+            referencedRelation: "subtasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_entries_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
