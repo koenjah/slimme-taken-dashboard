@@ -33,9 +33,12 @@ export const fetchTasks = async (): Promise<Task[]> => {
 };
 
 export const updateTask = async (task: Partial<Task> & { id: number }): Promise<void> => {
+  // Remove subtasks from the update payload to prevent the error
+  const { subtasks, ...taskUpdate } = task;
+  
   const { error } = await supabase
     .from('tasks')
-    .update(task)
+    .update(taskUpdate)
     .eq('id', task.id);
   
   if (error) throw error;
@@ -51,16 +54,19 @@ export const updateSubtask = async (subtask: Partial<Subtask> & { id: number }):
 };
 
 export const createTask = async (taskData: Partial<Task>): Promise<Task> => {
+  // Remove subtasks from the creation payload
+  const { subtasks, ...taskCreateData } = taskData;
+  
   const { data, error } = await supabase
     .from('tasks')
     .insert([{
-      name: taskData.name,
-      description: taskData.description || '',
-      icon: taskData.icon || 'zap',
-      priority_score: taskData.priority_score || 0,
-      progress: taskData.progress || 0,
-      completed: taskData.completed || false,
-      due_date: taskData.due_date || null,
+      name: taskCreateData.name,
+      description: taskCreateData.description || '',
+      icon: taskCreateData.icon || 'zap',
+      priority_score: taskCreateData.priority_score || 0,
+      progress: taskCreateData.progress || 0,
+      completed: taskCreateData.completed || false,
+      due_date: taskCreateData.due_date || null,
     }])
     .select()
     .single();
