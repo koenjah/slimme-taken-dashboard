@@ -54,11 +54,63 @@ const WeeklyOverview = () => {
     };
   }).sort((a, b) => b.weekKey.localeCompare(a.weekKey));
 
+  const currentDate = new Date();
+  const currentWeekStart = startOfWeek(currentDate, { locale: nl });
+  const currentWeekEnd = endOfWeek(currentDate, { locale: nl });
+  const currentWeek = format(currentDate, 'ww');
+
   return (
     <div className="space-y-6 mt-12">
       <h2 className="text-2xl font-title font-semibold">Urenregistratie</h2>
       
       <div className="space-y-4">
+        {/* Always show current week card if no entries exist */}
+        {weeks.length === 0 && (
+          <Card key="current-week" className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-4">
+                <span className="text-2xl font-semibold text-primary">
+                  Week {currentWeek}
+                </span>
+                <span className="text-muted-foreground">
+                  {format(currentWeekStart, 'd MMM', { locale: nl })} - {format(currentWeekEnd, 'd MMM yyyy', { locale: nl })}
+                </span>
+              </div>
+              <div className="text-xl font-semibold text-primary">
+                0 uur
+              </div>
+            </div>
+
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Titel</TableHead>
+                  <TableHead>Omschrijving</TableHead>
+                  <TableHead className="text-right">Uren</TableHead>
+                  <TableHead>Datum</TableHead>
+                  <TableHead className="w-[100px]">Acties</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                    Geen tijdregistraties voor deze week
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+
+            <div className="mt-4 flex gap-4 items-end">
+              <Button 
+                onClick={() => setIsTimeRegistrationOpen(true)}
+                className="w-full"
+              >
+                Nieuwe Tijd Registratie
+              </Button>
+            </div>
+          </Card>
+        )}
+
         {weeks.map((week) => (
           <Card key={week.weekKey} className="p-6">
             <div className="flex justify-between items-center mb-4">
