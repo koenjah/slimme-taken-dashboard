@@ -29,15 +29,15 @@ export const createTask = async (taskData: Partial<Task>): Promise<Task> => {
 
   const { data, error } = await supabase
     .from('tasks')
-    .insert({
+    .insert([{
       name: taskData.name,
       description: taskData.description || '',
       icon: taskData.icon || 'zap',
-      priority_score: taskData.priority_score || 1,
+      priority_score: taskData.priority_score || 0,
       progress: taskData.progress || 0,
       completed: taskData.completed || false,
       due_date: taskData.due_date || null,
-    })
+    }])
     .select(`
       *,
       subtasks (*)

@@ -10,12 +10,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Droppable } from "react-beautiful-dnd";
-import TaskSubItem from "./TaskSubItem";
 
 interface TaskCardProps {
   task: Task;
-  dragHandleProps: DraggableProvidedDragHandleProps;
+  dragHandleProps?: DraggableProvidedDragHandleProps;
   onTaskEdit: (task: Task) => void;
   onSubtaskUpdate: (subtask: { id: number } & Partial<Task>) => void;
 }
@@ -51,34 +49,10 @@ const TaskCard = ({ task, dragHandleProps, onTaskEdit, onSubtaskUpdate }: TaskCa
         </DropdownMenu>
       </CardHeader>
       <CardContent>
-        <div className="mb-4">
-          <Progress 
-            value={task.progress} 
-            className="h-2 bg-gray-100"
-          />
-        </div>
-        <Droppable droppableId={`task-${task.id}`}>
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="space-y-3"
-            >
-              {task.subtasks
-                .filter(subtask => !subtask.archived)
-                .map((subtask, index) => (
-                  <TaskSubItem
-                    key={subtask.id}
-                    subtask={subtask}
-                    taskId={task.id}
-                    index={index}
-                    onSubtaskUpdate={onSubtaskUpdate}
-                  />
-                ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
+        <Progress 
+          value={task.progress} 
+          className="h-2 bg-gray-100"
+        />
       </CardContent>
     </Card>
   );
