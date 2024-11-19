@@ -11,10 +11,11 @@ const TaskHeader = ({ onAddTask }: TaskHeaderProps) => {
       <h2 className="text-2xl font-semibold text-[#154273] font-poppins">Taken</h2>
       <Button 
         onClick={onAddTask} 
-        className="bg-[#154273] hover:bg-[#154273]/90 transition-all duration-200"
+        variant="ghost"
+        size="icon"
+        className="text-gray-600 hover:text-gray-800 hover:bg-gray-100"
       >
-        <Plus className="h-4 w-4 mr-2" />
-        Nieuwe Taak
+        <Plus className="h-5 w-5" />
       </Button>
     </div>
   );
