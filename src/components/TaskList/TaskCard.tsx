@@ -3,8 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 import { useState, useRef, useEffect } from "react";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import TaskCardHeader from "./TaskCardHeader";
 import SubtaskList from "./SubtaskList";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +14,7 @@ interface TaskCardProps {
   onTaskEdit: (task: Task) => void;
   onSubtaskUpdate: (subtask: { id: number } & Partial<Subtask>) => void;
   onSubtaskDelete?: (subtaskId: number) => void;
+  onTaskDelete?: (taskId: number) => void;
 }
 
 const TaskCard = ({ 
@@ -23,7 +22,8 @@ const TaskCard = ({
   dragHandleProps, 
   onTaskEdit, 
   onSubtaskUpdate,
-  onSubtaskDelete 
+  onSubtaskDelete,
+  onTaskDelete
 }: TaskCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
@@ -92,10 +92,16 @@ const TaskCard = ({
     }
   };
 
+  const handleDelete = () => {
+    if (onTaskDelete) {
+      onTaskDelete(task.id);
+    }
+  };
+
   return (
     <Card 
       ref={cardRef}
-      className="w-full animate-fade-in border-l-4 border-l-[#154273] bg-white hover:shadow-md transition-all duration-200 relative"
+      className="w-full animate-fade-in border-l-4 border-l-[#154273] bg-white hover:shadow-md transition-all duration-200"
     >
       <TaskCardHeader
         task={task}
@@ -105,6 +111,8 @@ const TaskCard = ({
         onEditedTaskChange={setEditedTask}
         onSave={handleSave}
         onEditToggle={() => setIsEditing(true)}
+        onAddSubtask={handleAddSubtask}
+        onDelete={handleDelete}
       />
       <CardContent className="space-y-4">
         <Progress 
@@ -122,15 +130,6 @@ const TaskCard = ({
             onSubtaskDelete={onSubtaskDelete}
           />
         )}
-
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute bottom-4 right-4 hover:bg-[#154273]/10 text-[#154273]"
-          onClick={handleAddSubtask}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
       </CardContent>
     </Card>
   );

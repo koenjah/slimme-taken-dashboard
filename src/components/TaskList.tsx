@@ -6,6 +6,7 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Plus } from "lucide-react";
 import TaskCard from "./TaskList/TaskCard";
 import { fetchTasks, updateTask, createTask, updateSubtask } from "./TaskList/mutations";
+import { supabase } from "@/integrations/supabase/client";
 
 const TaskList = () => {
   const { toast } = useToast();
@@ -47,6 +48,40 @@ const TaskList = () => {
       toast({
         title: "Taak toegevoegd",
         description: "De nieuwe taak is succesvol aangemaakt.",
+      });
+    },
+  });
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (taskId: number) => {
+      // First delete all subtasks
+      const { error: subtasksError } = await supabase
+        .from('subtasks')
+        .delete()
+        .eq('task_id', taskId);
+
+      if (subtasksError) throw subtasksError;
+
+      // Then delete the task
+      const { error: taskError } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', taskId);
+
+      if (taskError) throw taskError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast({
+        title: "Taak verwijderd",
+        description: "De taak en bijbehorende subtaken zijn succesvol verwijderd.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: "Er is een fout opgetreden bij het verwijderen van de taak.",
+        variant: "destructive",
       });
     },
   });
@@ -126,6 +161,9 @@ const TaskList = () => {
                             id: subtaskId,
                             archived: true
                           });
+                        }}
+                        onTaskDelete={(taskId) => {
+                          deleteTaskMutation.mutate(taskId);
                         }}
                       />
                     </div>
