@@ -2,6 +2,7 @@ import { Task } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export const fetchTasks = async (): Promise<Task[]> => {
+  // First fetch all tasks
   const { data: tasks, error: tasksError } = await supabase
     .from('tasks')
     .select('*')
@@ -9,7 +10,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
 
   if (tasksError) throw tasksError;
 
-  // Fetch subtasks for each task
+  // Then fetch subtasks for each task
   const tasksWithSubtasks = await Promise.all(
     (tasks || []).map(async (task) => {
       const { data: subtasks, error: subtasksError } = await supabase
