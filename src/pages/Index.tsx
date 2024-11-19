@@ -5,7 +5,7 @@ import ArchivedTaskList from "@/components/ArchivedTaskList";
 import WeeklyOverview from "@/components/TimeRegistration/WeeklyOverview";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Archive } from "lucide-react";
+import { FolderArchive } from "lucide-react";
 
 const Index = () => {
   const [isTimeRegistrationOpen, setIsTimeRegistrationOpen] = useState(false);
@@ -22,11 +22,11 @@ const Index = () => {
               className="text-white hover:text-white/80"
               onClick={() => setShowArchive(!showArchive)}
             >
-              <Archive className="h-5 w-5 mr-2" />
+              <FolderArchive className="h-5 w-5 mr-2" />
               {showArchive ? "Terug naar taken" : "Archief"}
             </Button>
           </div>
-          <p className="text-primary-foreground/80 mt-2">Werkzaamheden van Koen</p>
+          <p className="text-primary-foreground/80 mt-2">Werkzaamheden</p>
         </header>
 
         <div className="grid gap-8">
