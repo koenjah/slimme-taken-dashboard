@@ -3,10 +3,9 @@ import { Task } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { useState } from "react";
 import { Plus } from "lucide-react";
 import TaskCard from "./TaskList/TaskCard";
-import { fetchTasks, updateTask, createTask } from "./TaskList/mutations";
+import { fetchTasks, updateTask, createTask, updateSubtask } from "./TaskList/mutations";
 
 const TaskList = () => {
   const { toast } = useToast();
@@ -28,21 +27,19 @@ const TaskList = () => {
     },
   });
 
-  const createTaskMutation = useMutation({
-    mutationFn: async (taskData: Partial<Task>) => {
-      if (!taskData.name) {
-        throw new Error('Task name is required');
-      }
-      return createTask({
-        name: taskData.name,
-        description: taskData.description,
-        icon: taskData.icon,
-        priority_score: taskData.priority_score,
-        progress: taskData.progress,
-        completed: taskData.completed,
-        due_date: taskData.due_date,
+  const updateSubtaskMutation = useMutation({
+    mutationFn: updateSubtask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast({
+        title: "Subtaak bijgewerkt",
+        description: "De wijzigingen zijn succesvol opgeslagen.",
       });
     },
+  });
+
+  const createTaskMutation = useMutation({
+    mutationFn: createTask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
@@ -62,6 +59,7 @@ const TaskList = () => {
     const [removed] = newTasks.splice(sourceIndex, 1);
     newTasks.splice(destIndex, 0, removed);
 
+    // Update priority scores in reverse order (higher index = lower priority)
     const updates = newTasks.map((task, index) => ({
       id: task.id,
       priority_score: newTasks.length - index,
@@ -112,12 +110,13 @@ const TaskList = () => {
                             ...updatedTask
                           });
                         }}
-                        onSubtaskUpdate={updateTaskMutation.mutate}
+                        onSubtaskUpdate={(subtask) => {
+                          updateSubtaskMutation.mutate(subtask);
+                        }}
                         onSubtaskDelete={(subtaskId) => {
-                          updateTaskMutation.mutate({
+                          updateSubtaskMutation.mutate({
                             id: subtaskId,
-                            completed: true,
-                            progress: 100
+                            archived: true
                           });
                         }}
                       />

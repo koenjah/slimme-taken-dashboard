@@ -1,4 +1,4 @@
-import { Task } from "@/types";
+import { Task, Subtask } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export const fetchTasks = async (): Promise<Task[]> => {
@@ -10,7 +10,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
 
   if (tasksError) throw tasksError;
 
-  // Then fetch subtasks for each task
+  // For each task, fetch its subtasks
   const tasksWithSubtasks = await Promise.all(
     (tasks || []).map(async (task) => {
       const { data: subtasks, error: subtasksError } = await supabase
@@ -37,6 +37,15 @@ export const updateTask = async (task: Partial<Task> & { id: number }): Promise<
     .from('tasks')
     .update(task)
     .eq('id', task.id);
+  
+  if (error) throw error;
+};
+
+export const updateSubtask = async (subtask: Partial<Subtask> & { id: number }): Promise<void> => {
+  const { error } = await supabase
+    .from('subtasks')
+    .update(subtask)
+    .eq('id', subtask.id);
   
   if (error) throw error;
 };
