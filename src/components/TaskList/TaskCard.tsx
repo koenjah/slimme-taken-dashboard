@@ -28,6 +28,7 @@ const TaskCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
   const [editedSubtasks, setEditedSubtasks] = useState<Subtask[]>(task.subtasks || []);
+  const [deletedSubtaskIds, setDeletedSubtaskIds] = useState<number[]>([]); // Track deleted subtasks
   const cardRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -37,6 +38,7 @@ const TaskCard = ({
         setIsEditing(false);
         setEditedTask(task);
         setEditedSubtasks(task.subtasks || []);
+        setDeletedSubtaskIds([]); // Reset deleted subtasks on cancel
       }
     };
 
@@ -49,14 +51,24 @@ const TaskCard = ({
     };
   }, [isEditing, task]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // First delete any subtasks marked for deletion
+    if (onSubtaskDelete) {
+      for (const subtaskId of deletedSubtaskIds) {
+        await onSubtaskDelete(subtaskId);
+      }
+    }
+
+    // Then update the task and remaining subtasks
     onTaskEdit(editedTask);
     editedSubtasks.forEach(subtask => {
       if (JSON.stringify(subtask) !== JSON.stringify(task.subtasks?.find(s => s.id === subtask.id))) {
         onSubtaskUpdate(subtask);
       }
     });
+
     setIsEditing(false);
+    setDeletedSubtaskIds([]); // Reset deleted subtasks after save
   };
 
   const handleAddSubtask = async () => {
@@ -66,7 +78,7 @@ const TaskCard = ({
         .insert([{
           task_id: task.id,
           name: 'Nieuwe subtaak',
-          priority_score: (task.subtasks?.length || 0) + 1,
+          priority_score: (editedSubtasks.length || 0) + 1,
           progress: 0,
           completed: false,
         }])
@@ -75,9 +87,7 @@ const TaskCard = ({
 
       if (error) throw error;
 
-      const updatedSubtasks = [...(task.subtasks || []), newSubtask];
-      setEditedSubtasks(updatedSubtasks);
-      onTaskEdit({ ...task, subtasks: updatedSubtasks });
+      setEditedSubtasks([...editedSubtasks, newSubtask]);
 
       toast({
         title: "Subtaak toegevoegd",
@@ -96,6 +106,11 @@ const TaskCard = ({
     if (onTaskDelete) {
       onTaskDelete(task.id);
     }
+  };
+
+  const handleSubtaskDelete = (subtaskId: number) => {
+    setEditedSubtasks(prev => prev.filter(s => s.id !== subtaskId));
+    setDeletedSubtaskIds(prev => [...prev, subtaskId]);
   };
 
   return (
@@ -120,14 +135,14 @@ const TaskCard = ({
           className="h-2 bg-gray-100"
         />
         
-        {task.subtasks && task.subtasks.length > 0 && (
+        {editedSubtasks.length > 0 && (
           <SubtaskList
             taskId={task.id}
             isEditing={isEditing}
             editedSubtasks={editedSubtasks}
             onSubtasksChange={setEditedSubtasks}
             onSubtaskUpdate={onSubtaskUpdate}
-            onSubtaskDelete={onSubtaskDelete}
+            onSubtaskDelete={handleSubtaskDelete}
           />
         )}
       </CardContent>
