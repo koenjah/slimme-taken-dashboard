@@ -77,6 +77,7 @@ const SubtaskList = ({
                         }
                       }}
                       className="data-[state=checked]:bg-[#154273]"
+                      tabIndex={isEditing ? 0 : -1}
                     />
                     {isEditing ? (
                       <Input
@@ -124,7 +125,7 @@ const SubtaskList = ({
                         )}
                       </>
                     ) : (
-                      <span className="text-sm font-medium text-gray-500">
+                      <span className="text-sm font-medium text-gray-500 pointer-events-none">
                         {subtask.progress}%
                       </span>
                     )}
