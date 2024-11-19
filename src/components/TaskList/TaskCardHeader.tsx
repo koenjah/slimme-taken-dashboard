@@ -3,6 +3,7 @@ import { GripVertical, Save, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
+import { Slider } from "@/components/ui/slider";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,19 +61,19 @@ const TaskCardHeader = ({
           )}
         </div>
         {isEditing ? (
-          <div className="flex items-center space-x-2">
-            <Input
-              type="number"
-              value={editedTask.progress}
-              onChange={(e) => {
-                const progress = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                onEditedTaskChange({ ...editedTask, progress });
+          <div className="flex items-center space-x-4 min-w-[200px]">
+            <Slider
+              value={[editedTask.progress]}
+              onValueChange={(value) => {
+                onEditedTaskChange({ ...editedTask, progress: value[0] });
               }}
-              className="w-20 text-right"
-              min="0"
-              max="100"
+              max={100}
+              step={1}
+              className="flex-1"
             />
-            <span className="text-2xl font-bold text-[#154273] font-sans">%</span>
+            <span className="text-sm font-medium text-gray-500 w-12 text-right">
+              {editedTask.progress}%
+            </span>
           </div>
         ) : (
           <div className="text-2xl font-bold text-[#154273] font-sans">
