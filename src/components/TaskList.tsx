@@ -5,15 +5,12 @@ import { Button } from "@/components/ui/button";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import TaskForm from "./TaskForm";
 import TaskCard from "./TaskList/TaskCard";
 import { fetchTasks, updateTask, createTask } from "./TaskList/mutations";
 
 const TaskList = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [isAddingTask, setIsAddingTask] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const { data: tasks, isLoading } = useQuery({
     queryKey: ['tasks'],
@@ -81,7 +78,14 @@ const TaskList = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold text-primary">Taken</h2>
-        <Button onClick={() => setIsAddingTask(true)} className="bg-primary hover:bg-primary/90">
+        <Button onClick={() => {
+          createTaskMutation.mutate({
+            name: "Nieuwe taak",
+            priority_score: tasks?.length ? tasks.length + 1 : 1,
+            progress: 0,
+            completed: false,
+          });
+        }} className="bg-[#154273] hover:bg-[#154273]/90">
           <Plus className="h-4 w-4 mr-2" />
           Nieuwe Taak
         </Button>
@@ -102,8 +106,20 @@ const TaskList = () => {
                       <TaskCard
                         task={task}
                         dragHandleProps={provided.dragHandleProps}
-                        onTaskEdit={setEditingTask}
+                        onTaskEdit={(updatedTask) => {
+                          updateTaskMutation.mutate({
+                            id: task.id,
+                            ...updatedTask
+                          });
+                        }}
                         onSubtaskUpdate={updateTaskMutation.mutate}
+                        onSubtaskDelete={(subtaskId) => {
+                          updateTaskMutation.mutate({
+                            id: subtaskId,
+                            completed: true,
+                            progress: 100
+                          });
+                        }}
                       />
                     </div>
                   )}
@@ -114,30 +130,6 @@ const TaskList = () => {
           )}
         </Droppable>
       </DragDropContext>
-
-      <TaskForm
-        open={isAddingTask}
-        onOpenChange={setIsAddingTask}
-        onSubmit={(task) => {
-          if (task.name) {
-            createTaskMutation.mutate(task);
-          }
-        }}
-      />
-
-      <TaskForm
-        task={editingTask}
-        open={!!editingTask}
-        onOpenChange={(open) => !open && setEditingTask(null)}
-        onSubmit={(task) => {
-          if (editingTask && task.name) {
-            updateTaskMutation.mutate({
-              ...task,
-              id: editingTask.id,
-            });
-          }
-        }}
-      />
     </div>
   );
 };
