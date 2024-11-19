@@ -3,8 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 import { useState, useRef, useEffect } from "react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import TaskCardHeader from "./TaskCardHeader";
 import SubtaskList from "./SubtaskList";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface TaskCardProps {
   task: Task;
@@ -25,6 +29,7 @@ const TaskCard = ({
   const [editedTask, setEditedTask] = useState(task);
   const [editedSubtasks, setEditedSubtasks] = useState<Subtask[]>(task.subtasks || []);
   const cardRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,10 +59,43 @@ const TaskCard = ({
     setIsEditing(false);
   };
 
+  const handleAddSubtask = async () => {
+    try {
+      const { data: newSubtask, error } = await supabase
+        .from('subtasks')
+        .insert([{
+          task_id: task.id,
+          name: 'Nieuwe subtaak',
+          priority_score: (task.subtasks?.length || 0) + 1,
+          progress: 0,
+          completed: false,
+        }])
+        .select('*')
+        .single();
+
+      if (error) throw error;
+
+      const updatedSubtasks = [...(task.subtasks || []), newSubtask];
+      setEditedSubtasks(updatedSubtasks);
+      onTaskEdit({ ...task, subtasks: updatedSubtasks });
+
+      toast({
+        title: "Subtaak toegevoegd",
+        description: "De nieuwe subtaak is succesvol aangemaakt.",
+      });
+    } catch (error) {
+      toast({
+        title: "Fout bij toevoegen",
+        description: "Er is een fout opgetreden bij het aanmaken van de subtaak.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card 
       ref={cardRef}
-      className="w-full animate-fade-in border-l-4 border-l-[#154273] bg-white hover:shadow-md transition-all duration-200"
+      className="w-full animate-fade-in border-l-4 border-l-[#154273] bg-white hover:shadow-md transition-all duration-200 relative"
     >
       <TaskCardHeader
         task={task}
@@ -84,6 +122,15 @@ const TaskCard = ({
             onSubtaskDelete={onSubtaskDelete}
           />
         )}
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute bottom-4 right-4 hover:bg-[#154273]/10 text-[#154273]"
+          onClick={handleAddSubtask}
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
       </CardContent>
     </Card>
   );
