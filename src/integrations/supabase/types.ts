@@ -58,6 +58,7 @@ export type Database = {
       }
       tasks: {
         Row: {
+          archived: boolean | null
           completed: boolean | null
           created_at: string | null
           description: string | null
@@ -69,6 +70,7 @@ export type Database = {
           progress: number | null
         }
         Insert: {
+          archived?: boolean | null
           completed?: boolean | null
           created_at?: string | null
           description?: string | null
@@ -80,6 +82,7 @@ export type Database = {
           progress?: number | null
         }
         Update: {
+          archived?: boolean | null
           completed?: boolean | null
           created_at?: string | null
           description?: string | null

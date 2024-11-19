@@ -2,15 +2,14 @@ import { Task, Subtask } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export const fetchTasks = async (): Promise<Task[]> => {
-  // First fetch all tasks
   const { data: tasks, error: tasksError } = await supabase
     .from('tasks')
     .select('*')
+    .eq('archived', false)
     .order('priority_score', { ascending: false });
 
   if (tasksError) throw tasksError;
 
-  // For each task, fetch its subtasks
   const tasksWithSubtasks = await Promise.all(
     (tasks || []).map(async (task) => {
       const { data: subtasks, error: subtasksError } = await supabase
@@ -32,8 +31,37 @@ export const fetchTasks = async (): Promise<Task[]> => {
   return tasksWithSubtasks;
 };
 
+export const fetchArchivedTasks = async (): Promise<Task[]> => {
+  const { data: tasks, error: tasksError } = await supabase
+    .from('tasks')
+    .select('*')
+    .eq('archived', true)
+    .order('created_at', { ascending: false });
+
+  if (tasksError) throw tasksError;
+
+  const tasksWithSubtasks = await Promise.all(
+    (tasks || []).map(async (task) => {
+      const { data: subtasks, error: subtasksError } = await supabase
+        .from('subtasks')
+        .select('*')
+        .eq('task_id', task.id)
+        .eq('archived', true)
+        .order('created_at', { ascending: false });
+
+      if (subtasksError) throw subtasksError;
+
+      return {
+        ...task,
+        subtasks: subtasks || [],
+      };
+    })
+  );
+
+  return tasksWithSubtasks;
+};
+
 export const updateTask = async (task: Partial<Task> & { id: number }): Promise<void> => {
-  // Remove subtasks from the update payload to prevent the error
   const { subtasks, ...taskUpdate } = task;
   
   const { error } = await supabase
@@ -54,7 +82,6 @@ export const updateSubtask = async (subtask: Partial<Subtask> & { id: number }):
 };
 
 export const createTask = async (taskData: Partial<Task>): Promise<Task> => {
-  // Remove subtasks from the creation payload
   const { subtasks, ...taskCreateData } = taskData;
   
   const { data, error } = await supabase
@@ -67,6 +94,7 @@ export const createTask = async (taskData: Partial<Task>): Promise<Task> => {
       progress: taskCreateData.progress || 0,
       completed: taskCreateData.completed || false,
       due_date: taskCreateData.due_date || null,
+      archived: false,
     }])
     .select()
     .single();

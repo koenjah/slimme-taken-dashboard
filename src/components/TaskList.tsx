@@ -20,6 +20,7 @@ const TaskList = () => {
     mutationFn: updateTask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['archivedTasks'] });
       toast({
         title: "Taak bijgewerkt",
         description: "De wijzigingen zijn succesvol opgeslagen.",
@@ -31,6 +32,7 @@ const TaskList = () => {
     mutationFn: updateSubtask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['archivedTasks'] });
       toast({
         title: "Subtaak bijgewerkt",
         description: "De wijzigingen zijn succesvol opgeslagen.",
@@ -59,7 +61,6 @@ const TaskList = () => {
     const [removed] = newTasks.splice(sourceIndex, 1);
     newTasks.splice(destIndex, 0, removed);
 
-    // Update priority scores in reverse order (higher index = lower priority)
     const updates = newTasks.map((task, index) => ({
       id: task.id,
       priority_score: newTasks.length - index,
@@ -68,6 +69,21 @@ const TaskList = () => {
     for (const update of updates) {
       await updateTaskMutation.mutateAsync(update);
     }
+  };
+
+  const handleTaskUpdate = (task: Task) => {
+    updateTaskMutation.mutate({
+      id: task.id,
+      ...task,
+      archived: task.completed || task.progress === 100,
+    });
+  };
+
+  const handleSubtaskUpdate = (subtask: { id: number } & Partial<Task>) => {
+    updateSubtaskMutation.mutate({
+      ...subtask,
+      archived: subtask.completed || subtask.progress === 100,
+    });
   };
 
   if (isLoading) return <div className="animate-pulse">Taken Laden...</div>;
@@ -104,15 +120,8 @@ const TaskList = () => {
                       <TaskCard
                         task={task}
                         dragHandleProps={provided.dragHandleProps}
-                        onTaskEdit={(updatedTask) => {
-                          updateTaskMutation.mutate({
-                            id: task.id,
-                            ...updatedTask
-                          });
-                        }}
-                        onSubtaskUpdate={(subtask) => {
-                          updateSubtaskMutation.mutate(subtask);
-                        }}
+                        onTaskEdit={handleTaskUpdate}
+                        onSubtaskUpdate={handleSubtaskUpdate}
                         onSubtaskDelete={(subtaskId) => {
                           updateSubtaskMutation.mutate({
                             id: subtaskId,
