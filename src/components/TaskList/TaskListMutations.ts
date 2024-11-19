@@ -30,7 +30,10 @@ export const createTask = async (taskData: Partial<Task>): Promise<Task> => {
       completed: taskData.completed || false,
       due_date: taskData.due_date || null,
     })
-    .select('*')
+    .select(`
+      *,
+      subtasks (*)
+    `)
     .single();
 
   if (error) throw error;

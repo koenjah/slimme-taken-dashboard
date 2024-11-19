@@ -1,8 +1,9 @@
+import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 import { Task } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { GripVertical, MoreVertical, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PenTool, Settings, Zap, MoreVertical, Edit3, GripVertical } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,21 +15,10 @@ import TaskSubItem from "./TaskSubItem";
 
 interface TaskCardProps {
   task: Task;
-  dragHandleProps: any;
+  dragHandleProps: DraggableProvidedDragHandleProps;
   onTaskEdit: (task: Task) => void;
   onSubtaskUpdate: (subtask: { id: number } & Partial<Task>) => void;
 }
-
-const getIcon = (iconName: string | null) => {
-  switch (iconName) {
-    case "penTool":
-      return <PenTool className="h-5 w-5" />;
-    case "settings":
-      return <Settings className="h-5 w-5" />;
-    default:
-      return <Zap className="h-5 w-5" />;
-  }
-};
 
 const TaskCard = ({ task, dragHandleProps, onTaskEdit, onSubtaskUpdate }: TaskCardProps) => {
   return (
@@ -36,9 +26,6 @@ const TaskCard = ({ task, dragHandleProps, onTaskEdit, onSubtaskUpdate }: TaskCa
       <CardHeader className="flex flex-row items-center space-x-4">
         <div {...dragHandleProps}>
           <GripVertical className="h-5 w-5 text-gray-400" />
-        </div>
-        <div className="text-primary">
-          {getIcon(task.icon)}
         </div>
         <div className="flex-1">
           <CardTitle className="text-lg font-bold text-primary">
