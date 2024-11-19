@@ -1,4 +1,4 @@
-import { Task } from "@/types";
+import { Task, Subtask } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
@@ -10,7 +10,7 @@ interface TaskCardProps {
   task: Task;
   dragHandleProps?: DraggableProvidedDragHandleProps;
   onTaskEdit: (task: Task) => void;
-  onSubtaskUpdate: (subtask: { id: number } & Partial<Task>) => void;
+  onSubtaskUpdate: (subtask: { id: number } & Partial<Subtask>) => void;
   onSubtaskDelete?: (subtaskId: number) => void;
 }
 
@@ -23,7 +23,7 @@ const TaskCard = ({
 }: TaskCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
-  const [editedSubtasks, setEditedSubtasks] = useState(task.subtasks || []);
+  const [editedSubtasks, setEditedSubtasks] = useState<Subtask[]>(task.subtasks || []);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { Task } from "@/types";
+import { Task, Subtask } from "@/types";
 import { GripVertical, Trash2 } from "lucide-react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Button } from "@/components/ui/button";
@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input";
 interface SubtaskListProps {
   taskId: number;
   isEditing: boolean;
-  editedSubtasks: Task[];
-  onSubtasksChange: (subtasks: Task[]) => void;
-  onSubtaskUpdate: (subtask: { id: number } & Partial<Task>) => void;
+  editedSubtasks: Subtask[];
+  onSubtasksChange: (subtasks: Subtask[]) => void;
+  onSubtaskUpdate: (subtask: { id: number } & Partial<Subtask>) => void;
   onSubtaskDelete?: (subtaskId: number) => void;
 }
 

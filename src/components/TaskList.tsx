@@ -73,7 +73,6 @@ const TaskList = () => {
 
   const handleTaskUpdate = (task: Task) => {
     updateTaskMutation.mutate({
-      id: task.id,
       ...task,
       archived: task.completed || task.progress === 100,
     });

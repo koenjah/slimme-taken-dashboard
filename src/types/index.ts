@@ -8,6 +8,7 @@ export interface Task {
   icon: string | null;
   due_date: string | null;
   created_at: string;
+  archived: boolean;
   subtasks: Subtask[];
 }
 
