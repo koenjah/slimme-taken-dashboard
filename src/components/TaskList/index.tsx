@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Task } from "@/types";
-import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
@@ -15,6 +14,7 @@ const TaskList = () => {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
+  // Fetch tasks with proper typing
   const { data: tasks = [], isLoading } = useQuery<Task[]>({
     queryKey: ['tasks'],
     queryFn: fetchTasks,
