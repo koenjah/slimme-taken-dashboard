@@ -14,6 +14,14 @@ export const fetchTasks = async (): Promise<Task[]> => {
   return data || [];
 };
 
+export const updateTask = async (task: { id: number } & Partial<Task>): Promise<void> => {
+  const { error } = await supabase
+    .from('tasks')
+    .update(task)
+    .eq('id', task.id);
+  if (error) throw error;
+};
+
 export const createTask = async (taskData: Partial<Task>): Promise<Task> => {
   if (!taskData.name) {
     throw new Error('Task name is required');
@@ -38,12 +46,4 @@ export const createTask = async (taskData: Partial<Task>): Promise<Task> => {
 
   if (error) throw error;
   return data;
-};
-
-export const updateTask = async (task: { id: number } & Partial<Omit<Task, 'subtasks' | 'created_at'>>): Promise<void> => {
-  const { error } = await supabase
-    .from('tasks')
-    .update(task)
-    .eq('id', task.id);
-  if (error) throw error;
 };
