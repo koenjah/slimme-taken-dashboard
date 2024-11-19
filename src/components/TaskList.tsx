@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useState } from "react";
 import TaskForm from "./TaskForm";
-import { fetchTasks, updateTask, createTask } from "./TaskListMutations";
+import { fetchTasks, updateTask, createTask } from "./TaskList/mutations";
 
 const TaskList = () => {
   const { toast } = useToast();
