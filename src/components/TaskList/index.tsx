@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Task } from "@/types";
+import { Plus } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import TaskForm from "../TaskForm";
 import TaskCard from "./TaskCard";
 import { fetchTasks, updateTask, createTask } from "./TaskListMutations";
@@ -15,7 +15,7 @@ const TaskList = () => {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  const { data: tasks, isLoading } = useQuery({
+  const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['tasks'],
     queryFn: fetchTasks,
   });
@@ -79,7 +79,7 @@ const TaskList = () => {
         <Droppable droppableId="tasks">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
-              {tasks?.map((task, index) => (
+              {tasks.map((task, index) => (
                 <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
                   {(provided) => (
                     <div
