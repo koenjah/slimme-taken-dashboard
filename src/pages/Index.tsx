@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import TaskList from "@/components/TaskList";
 import TimeRegistration from "@/components/TimeRegistration";
 import ArchivedTaskList from "@/components/ArchivedTaskList";
+import WeeklyOverview from "@/components/TimeRegistration/WeeklyOverview";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Archive } from "lucide-react";
@@ -32,7 +33,10 @@ const Index = () => {
           {showArchive ? (
             <ArchivedTaskList />
           ) : (
-            <TaskList />
+            <>
+              <TaskList />
+              <WeeklyOverview />
+            </>
           )}
           <TimeRegistration 
             open={isTimeRegistrationOpen}
