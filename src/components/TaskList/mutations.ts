@@ -16,7 +16,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
         .from('subtasks')
         .select('*')
         .eq('task_id', task.id)
-        .eq('archived', false)
+        .eq('completed', false)  // Only fetch non-completed subtasks
         .order('priority_score', { ascending: false });
 
       if (subtasksError) throw subtasksError;
