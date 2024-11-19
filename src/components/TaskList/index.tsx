@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useState } from "react";
+import { Plus } from "lucide-react";
 import TaskForm from "../TaskForm";
 import TaskCard from "./TaskCard";
 import { fetchTasks, updateTask, createTask } from "./mutations";
