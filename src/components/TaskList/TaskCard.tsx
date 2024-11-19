@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Edit3, GripVertical, MoreVertical } from "lucide-react";
 import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,11 +49,40 @@ const TaskCard = ({ task, dragHandleProps, onTaskEdit, onSubtaskUpdate }: TaskCa
           </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <Progress 
           value={task.progress} 
           className="h-2 bg-gray-100"
         />
+        
+        {task.subtasks && task.subtasks.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">Subtaken</h4>
+            <div className="space-y-2">
+              {task.subtasks.map((subtask) => (
+                <div key={subtask.id} className="flex items-center space-x-3 p-2 bg-white/80 rounded-md shadow-sm border border-gray-100">
+                  <Checkbox 
+                    checked={subtask.completed}
+                    onCheckedChange={(checked) => {
+                      onSubtaskUpdate({
+                        id: subtask.id,
+                        completed: checked as boolean,
+                        progress: checked ? 100 : 0,
+                      });
+                    }}
+                    className="data-[state=checked]:bg-primary"
+                  />
+                  <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
+                    {subtask.name}
+                  </span>
+                  <span className="text-sm font-medium text-gray-500">
+                    {subtask.progress}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
