@@ -63,7 +63,10 @@ const WeeklyOverview = () => {
           />
         ))}
         
-        <TimeEntryInlineForm />
+        <TimeEntryInlineForm 
+          editingEntry={editingEntry}
+          onEditComplete={() => setEditingEntry(null)}
+        />
       </div>
     </div>
   );

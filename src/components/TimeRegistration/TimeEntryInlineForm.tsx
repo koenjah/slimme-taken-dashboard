@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { TimeEntry } from "@/types";
 
-const TimeEntryInlineForm = () => {
+interface TimeEntryInlineFormProps {
+  editingEntry?: TimeEntry | null;
+  onEditComplete?: () => void;
+}
+
+const TimeEntryInlineForm = ({ editingEntry, onEditComplete }: TimeEntryInlineFormProps) => {
   const [formData, setFormData] = useState({
     task_id: "",
     subtask_id: "",
@@ -16,21 +21,41 @@ const TimeEntryInlineForm = () => {
     date: new Date().toISOString().split('T')[0],
   });
 
+  useEffect(() => {
+    if (editingEntry) {
+      setFormData({
+        task_id: editingEntry.task_id?.toString() || "",
+        subtask_id: editingEntry.subtask_id?.toString() || "",
+        hours: editingEntry.hours.toString(),
+        description: editingEntry.description || "",
+        date: new Date(editingEntry.date).toISOString().split('T')[0],
+      });
+    }
+  }, [editingEntry]);
+
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const createTimeEntryMutation = useMutation({
-    mutationFn: async (entry: Partial<TimeEntry>) => {
-      const { error } = await supabase
-        .from('time_entries')
-        .insert([entry]);
-      if (error) throw error;
+  const mutation = useMutation({
+    mutationFn: async (entry: { hours: number; task_id?: number | null; subtask_id?: number | null; description?: string; date: string }) => {
+      if (editingEntry) {
+        const { error } = await supabase
+          .from('time_entries')
+          .update(entry)
+          .eq('id', editingEntry.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('time_entries')
+          .insert([entry]);
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['time_entries'] });
       toast({
-        title: "Tijd geregistreerd",
-        description: "De tijd is succesvol geregistreerd.",
+        title: editingEntry ? "Tijd bijgewerkt" : "Tijd geregistreerd",
+        description: editingEntry ? "De tijd is succesvol bijgewerkt." : "De tijd is succesvol geregistreerd.",
       });
       setFormData({
         task_id: "",
@@ -39,17 +64,22 @@ const TimeEntryInlineForm = () => {
         description: "",
         date: new Date().toISOString().split('T')[0],
       });
+      if (editingEntry && onEditComplete) {
+        onEditComplete();
+      }
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createTimeEntryMutation.mutate({
-      ...formData,
+    const entry = {
       hours: parseFloat(formData.hours),
       task_id: formData.task_id ? parseInt(formData.task_id) : null,
       subtask_id: formData.subtask_id ? parseInt(formData.subtask_id) : null,
-    });
+      description: formData.description,
+      date: formData.date,
+    };
+    mutation.mutate(entry);
   };
 
   return (
@@ -79,7 +109,7 @@ const TimeEntryInlineForm = () => {
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
           />
           <Button type="submit">
-            Toevoegen
+            {editingEntry ? "Bijwerken" : "Toevoegen"}
           </Button>
         </div>
       </form>

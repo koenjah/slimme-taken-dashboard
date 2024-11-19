@@ -7,6 +7,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { TimeEntry } from "@/types";
 import { deleteTimeEntry } from "./mutations";
 import { useToast } from "@/components/ui/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface WeekCardProps {
   weekNumber: string;
@@ -19,6 +20,28 @@ interface WeekCardProps {
 
 const WeekCard = ({ weekNumber, startDate, endDate, entries, totalHours, onEditEntry }: WeekCardProps) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteTimeEntry(id);
+      queryClient.invalidateQueries({ queryKey: ['time_entries'] });
+      toast({
+        title: "Tijdregistratie verwijderd",
+        description: "De tijdregistratie is succesvol verwijderd.",
+      });
+    } catch (error) {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het verwijderen van de tijdregistratie.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (entries.length === 0) {
+    return null;
+  }
 
   return (
     <Card className="p-6">
@@ -47,46 +70,32 @@ const WeekCard = ({ weekNumber, startDate, endDate, entries, totalHours, onEditE
           </TableRow>
         </TableHeader>
         <TableBody>
-          {entries.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center text-muted-foreground">
-                Geen tijdregistraties voor deze week
+          {entries.map((entry) => (
+            <TableRow key={entry.id}>
+              <TableCell>{entry.tasks?.name || entry.subtasks?.name || "Onbekend"}</TableCell>
+              <TableCell>{entry.description || "-"}</TableCell>
+              <TableCell className="text-right">{entry.hours}</TableCell>
+              <TableCell>{format(new Date(entry.date), 'd MMM yyyy', { locale: nl })}</TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEditEntry(entry)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(entry.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
-          ) : (
-            entries.map((entry) => (
-              <TableRow key={entry.id}>
-                <TableCell>{entry.tasks?.name || entry.subtasks?.name || "Onbekend"}</TableCell>
-                <TableCell>{entry.description || "-"}</TableCell>
-                <TableCell className="text-right">{entry.hours}</TableCell>
-                <TableCell>{format(new Date(entry.date), 'd MMM yyyy', { locale: nl })}</TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onEditEntry(entry)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        deleteTimeEntry(entry.id);
-                        toast({
-                          title: "Tijdregistratie verwijderd",
-                          description: "De tijdregistratie is succesvol verwijderd.",
-                        });
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
+          ))}
         </TableBody>
       </Table>
     </Card>
