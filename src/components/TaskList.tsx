@@ -1,22 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Task } from "@/types";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { PenTool, Settings, Zap, MoreVertical, GripVertical, Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useState } from "react";
+import { Plus } from "lucide-react";
 import TaskForm from "./TaskForm";
+import TaskCard from "./TaskList/TaskCard";
 import { fetchTasks, updateTask, createTask } from "./TaskList/mutations";
 
 const TaskList = () => {
@@ -150,17 +140,6 @@ const TaskList = () => {
       />
     </div>
   );
-};
-
-const getIcon = (iconName: string | null) => {
-  switch (iconName) {
-    case "penTool":
-      return <PenTool className="h-5 w-5" />;
-    case "settings":
-      return <Settings className="h-5 w-5" />;
-    default:
-      return <Zap className="h-5 w-5" />;
-  }
 };
 
 export default TaskList;
