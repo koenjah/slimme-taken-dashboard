@@ -25,13 +25,15 @@ const TaskCard = ({
 }: TaskCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
+  const [editedSubtasks, setEditedSubtasks] = useState(task.subtasks || []);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
         setIsEditing(false);
-        setEditedTask(task); // Reset changes
+        setEditedTask(task);
+        setEditedSubtasks(task.subtasks || []);
       }
     };
 
@@ -46,6 +48,11 @@ const TaskCard = ({
 
   const handleSave = () => {
     onTaskEdit(editedTask);
+    editedSubtasks.forEach(subtask => {
+      if (JSON.stringify(subtask) !== JSON.stringify(task.subtasks?.find(s => s.id === subtask.id))) {
+        onSubtaskUpdate(subtask);
+      }
+    });
     setIsEditing(false);
   };
 
@@ -96,7 +103,7 @@ const TaskCard = ({
         {task.subtasks && task.subtasks.length > 0 && (
           <div className="space-y-2">
             <div className="space-y-2">
-              {task.subtasks.map((subtask) => (
+              {editedSubtasks.map((subtask) => (
                 <div 
                   key={subtask.id} 
                   className="flex items-center space-x-3 p-2 bg-white rounded-md shadow-sm border border-gray-100 hover:border-[#154273]/20 transition-all group"
@@ -104,11 +111,17 @@ const TaskCard = ({
                   <Checkbox 
                     checked={subtask.completed}
                     onCheckedChange={(checked) => {
-                      onSubtaskUpdate({
-                        id: subtask.id,
+                      const updatedSubtask = {
+                        ...subtask,
                         completed: checked as boolean,
                         progress: checked ? 100 : 0,
-                      });
+                      };
+                      setEditedSubtasks(prev => 
+                        prev.map(s => s.id === subtask.id ? updatedSubtask : s)
+                      );
+                      if (!isEditing) {
+                        onSubtaskUpdate(updatedSubtask);
+                      }
                     }}
                     className="data-[state=checked]:bg-[#154273]"
                   />
@@ -116,11 +129,9 @@ const TaskCard = ({
                     <Input
                       value={subtask.name}
                       onChange={(e) => {
-                        const updatedSubtask = { ...subtask, name: e.target.value };
-                        onSubtaskUpdate({
-                          id: subtask.id,
-                          name: e.target.value
-                        });
+                        setEditedSubtasks(prev =>
+                          prev.map(s => s.id === subtask.id ? { ...s, name: e.target.value } : s)
+                        );
                       }}
                       className="flex-1"
                     />
@@ -136,11 +147,9 @@ const TaskCard = ({
                         value={subtask.progress}
                         onChange={(e) => {
                           const progress = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                          onSubtaskUpdate({
-                            id: subtask.id,
-                            progress,
-                            completed: progress === 100,
-                          });
+                          setEditedSubtasks(prev =>
+                            prev.map(s => s.id === subtask.id ? { ...s, progress, completed: progress === 100 } : s)
+                          );
                         }}
                         className="w-20 text-right"
                         min="0"
