@@ -2,16 +2,33 @@ import { Task } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export const fetchTasks = async (): Promise<Task[]> => {
-  const { data, error } = await supabase
+  const { data: tasks, error: tasksError } = await supabase
     .from('tasks')
-    .select(`
-      *,
-      subtasks (*)
-    `)
+    .select('*')
     .order('priority_score', { ascending: false });
 
-  if (error) throw error;
-  return data || [];
+  if (tasksError) throw tasksError;
+
+  // Fetch subtasks for each task
+  const tasksWithSubtasks = await Promise.all(
+    (tasks || []).map(async (task) => {
+      const { data: subtasks, error: subtasksError } = await supabase
+        .from('subtasks')
+        .select('*')
+        .eq('task_id', task.id)
+        .eq('archived', false)
+        .order('priority_score', { ascending: false });
+
+      if (subtasksError) throw subtasksError;
+
+      return {
+        ...task,
+        subtasks: subtasks || [],
+      };
+    })
+  );
+
+  return tasksWithSubtasks;
 };
 
 export const updateTask = async (task: Partial<Task> & { id: number }): Promise<void> => {
@@ -35,12 +52,9 @@ export const createTask = async (taskData: Partial<Task>): Promise<Task> => {
       completed: taskData.completed || false,
       due_date: taskData.due_date || null,
     }])
-    .select(`
-      *,
-      subtasks (*)
-    `)
+    .select()
     .single();
 
   if (error) throw error;
-  return data;
+  return { ...data, subtasks: [] };
 };

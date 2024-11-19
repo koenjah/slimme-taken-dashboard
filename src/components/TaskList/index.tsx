@@ -3,7 +3,6 @@ import { Task } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { useState } from "react";
 import { Plus } from "lucide-react";
 import TaskCard from "./TaskCard";
 import { fetchTasks, updateTask, createTask } from "./mutations";
@@ -11,9 +10,8 @@ import { fetchTasks, updateTask, createTask } from "./mutations";
 const TaskList = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [isAddingTask, setIsAddingTask] = useState(false);
 
-  const { data: tasks = [], isLoading } = useQuery<Task[]>({
+  const { data: tasks, isLoading } = useQuery({
     queryKey: ['tasks'],
     queryFn: fetchTasks,
   });
@@ -37,7 +35,6 @@ const TaskList = () => {
         title: "Taak toegevoegd",
         description: "De nieuwe taak is succesvol aangemaakt.",
       });
-      setIsAddingTask(false);
     },
   });
 
@@ -66,19 +63,15 @@ const TaskList = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-title font-semibold text-[#154273]">Taken</h2>
-        <Button 
-          onClick={() => {
-            createTaskMutation.mutate({
-              name: "Nieuwe taak",
-              description: "",
-              priority_score: tasks.length + 1,
-              progress: 0,
-              completed: false,
-            });
-          }} 
-          className="bg-[#154273] hover:bg-[#154273]/90"
-        >
+        <h2 className="text-2xl font-semibold text-primary">Taken</h2>
+        <Button onClick={() => {
+          createTaskMutation.mutate({
+            name: "Nieuwe taak",
+            priority_score: tasks?.length ? tasks.length + 1 : 1,
+            progress: 0,
+            completed: false,
+          });
+        }} className="bg-[#154273] hover:bg-[#154273]/90">
           <Plus className="h-4 w-4 mr-2" />
           Nieuwe Taak
         </Button>
@@ -88,7 +81,7 @@ const TaskList = () => {
         <Droppable droppableId="tasks">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
-              {tasks.map((task, index) => (
+              {tasks?.map((task, index) => (
                 <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
                   {(provided) => (
                     <div
@@ -99,13 +92,19 @@ const TaskList = () => {
                       <TaskCard
                         task={task}
                         dragHandleProps={provided.dragHandleProps}
-                        onTaskEdit={updateTaskMutation.mutate}
+                        onTaskEdit={(updatedTask) => {
+                          updateTaskMutation.mutate({
+                            id: task.id,
+                            ...updatedTask
+                          });
+                        }}
                         onSubtaskUpdate={updateTaskMutation.mutate}
                         onSubtaskDelete={(subtaskId) => {
-                          // Handle subtask deletion
+                          // Instead of using archived, we'll update the completion status
                           updateTaskMutation.mutate({
                             id: subtaskId,
-                            archived: true
+                            completed: true,
+                            progress: 100
                           });
                         }}
                       />
