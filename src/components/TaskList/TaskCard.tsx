@@ -28,17 +28,15 @@ const TaskCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
   const [editedSubtasks, setEditedSubtasks] = useState<Subtask[]>(task.subtasks || []);
-  const [deletedSubtaskIds, setDeletedSubtaskIds] = useState<number[]>([]); // Track deleted subtasks
+  const [deletedSubtaskIds, setDeletedSubtaskIds] = useState<number[]>([]);
   const cardRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
+  // Handle click outside to save and exit edit mode
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
-        setIsEditing(false);
-        setEditedTask(task);
-        setEditedSubtasks(task.subtasks || []);
-        setDeletedSubtaskIds([]); // Reset deleted subtasks on cancel
+        handleSave();
       }
     };
 
@@ -49,7 +47,7 @@ const TaskCard = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isEditing, task]);
+  }, [isEditing, editedTask, editedSubtasks, deletedSubtaskIds]);
 
   const handleSave = async () => {
     // First delete any subtasks marked for deletion
@@ -68,7 +66,7 @@ const TaskCard = ({
     });
 
     setIsEditing(false);
-    setDeletedSubtaskIds([]); // Reset deleted subtasks after save
+    setDeletedSubtaskIds([]);
   };
 
   const handleAddSubtask = async () => {
@@ -113,10 +111,18 @@ const TaskCard = ({
     setDeletedSubtaskIds(prev => [...prev, subtaskId]);
   };
 
+  // Enter edit mode when clicking any subtask
+  const handleSubtaskClick = () => {
+    if (!isEditing) {
+      setIsEditing(true);
+    }
+  };
+
   return (
     <Card 
       ref={cardRef}
       className="w-full animate-fade-in border-l-4 border-l-[#154273] bg-white hover:shadow-md transition-all duration-200"
+      onClick={handleSubtaskClick}
     >
       <TaskCardHeader
         task={task}
@@ -125,9 +131,9 @@ const TaskCard = ({
         dragHandleProps={dragHandleProps}
         onEditedTaskChange={setEditedTask}
         onSave={handleSave}
-        onEditToggle={() => setIsEditing(true)}
         onAddSubtask={handleAddSubtask}
         onDelete={handleDelete}
+        showEditButton={false}
       />
       <CardContent className="space-y-4">
         <Progress 
