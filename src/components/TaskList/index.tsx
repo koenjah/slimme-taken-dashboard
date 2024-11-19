@@ -39,6 +39,7 @@ const TaskList = () => {
         title: "Taak toegevoegd",
         description: "De nieuwe taak is succesvol aangemaakt.",
       });
+      setIsAddingTask(false);
     },
   });
 
