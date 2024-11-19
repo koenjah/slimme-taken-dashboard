@@ -15,7 +15,7 @@ const TaskList = () => {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  const { data: tasks = [], isLoading } = useQuery({
+  const { data: tasks = [], isLoading } = useQuery<Task[]>({
     queryKey: ['tasks'],
     queryFn: fetchTasks,
   });
@@ -39,7 +39,6 @@ const TaskList = () => {
         title: "Taak toegevoegd",
         description: "De nieuwe taak is succesvol aangemaakt.",
       });
-      setIsAddingTask(false);
     },
   });
 
