@@ -3,16 +3,19 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Pencil, Trash2 } from "lucide-react";
 import { TimeEntry } from "@/types";
-import { format, startOfWeek, endOfWeek, getWeek } from "date-fns";
+import { format, startOfWeek, endOfWeek } from "date-fns";
 import { nl } from "date-fns/locale";
 import { fetchTimeEntries, deleteTimeEntry } from "./mutations";
 import TimeEntryForm from "../TimeEntryForm";
 import { useToast } from "@/components/ui/use-toast";
+import TimeRegistration from "../TimeRegistration";
 
 const WeeklyOverview = () => {
   const [editingEntry, setEditingEntry] = useState<TimeEntry | null>(null);
+  const [isTimeRegistrationOpen, setIsTimeRegistrationOpen] = useState(false);
   const { toast } = useToast();
 
   const { data: timeEntries = [], isLoading } = useQuery({
@@ -117,6 +120,15 @@ const WeeklyOverview = () => {
                 ))}
               </TableBody>
             </Table>
+
+            <div className="mt-4 flex gap-4 items-end">
+              <Button 
+                onClick={() => setIsTimeRegistrationOpen(true)}
+                className="w-full"
+              >
+                Nieuwe Tijd Registratie
+              </Button>
+            </div>
           </Card>
         ))}
       </div>
@@ -127,6 +139,11 @@ const WeeklyOverview = () => {
         onOpenChange={(open) => !open && setEditingEntry(null)}
         onSubmit={() => setEditingEntry(null)}
         tasks={[]}
+      />
+
+      <TimeRegistration
+        open={isTimeRegistrationOpen}
+        onOpenChange={setIsTimeRegistrationOpen}
       />
     </div>
   );
