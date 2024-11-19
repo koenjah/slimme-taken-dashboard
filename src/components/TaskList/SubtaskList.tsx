@@ -4,6 +4,7 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 
 interface SubtaskListProps {
   taskId: number;
@@ -98,22 +99,23 @@ const SubtaskList = ({
                       </span>
                     )}
                     {isEditing ? (
-                      <>
-                        <Input
-                          type="number"
-                          value={subtask.progress}
-                          onChange={(e) => {
-                            const progress = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                      <div className="flex items-center space-x-4 min-w-[200px]">
+                        <Slider
+                          value={[subtask.progress]}
+                          onValueChange={(value) => {
                             onSubtasksChange(
                               editedSubtasks.map(s =>
-                                s.id === subtask.id ? { ...s, progress, completed: progress === 100 } : s
+                                s.id === subtask.id ? { ...s, progress: value[0], completed: value[0] === 100 } : s
                               )
                             );
                           }}
-                          className="w-20 text-right"
-                          min="0"
-                          max="100"
+                          max={100}
+                          step={1}
+                          className="flex-1"
                         />
+                        <span className="text-sm font-medium text-gray-500 w-12 text-right">
+                          {subtask.progress}%
+                        </span>
                         {onSubtaskDelete && (
                           <Button
                             variant="ghost"
@@ -124,7 +126,7 @@ const SubtaskList = ({
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         )}
-                      </>
+                      </div>
                     ) : (
                       <span className="text-sm font-medium text-gray-500 pointer-events-none select-none">
                         {subtask.progress}%
