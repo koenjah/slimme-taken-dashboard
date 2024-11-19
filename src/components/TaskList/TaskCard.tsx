@@ -76,7 +76,7 @@ const TaskCard = ({
         .insert([{
           task_id: task.id,
           name: 'Nieuwe subtaak',
-          priority_score: (editedSubtasks.length || 0) + 1,
+          priority_score: Math.max(...editedSubtasks.map(s => s.priority_score || 0), 0) + 1,
           progress: 0,
           completed: false,
         }])
@@ -85,7 +85,7 @@ const TaskCard = ({
 
       if (error) throw error;
 
-      setEditedSubtasks([...editedSubtasks, newSubtask]);
+      setEditedSubtasks([newSubtask, ...editedSubtasks]);
 
       toast({
         title: "Subtaak toegevoegd",
