@@ -1,8 +1,8 @@
-import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 import { Task } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { GripVertical, MoreVertical, Edit3 } from "lucide-react";
+import { Edit3, GripVertical, MoreVertical } from "lucide-react";
+import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
