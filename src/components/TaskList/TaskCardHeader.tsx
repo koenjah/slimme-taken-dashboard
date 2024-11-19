@@ -81,6 +81,14 @@ const TaskCardHeader = ({
           </div>
         )}
         <div className="flex items-center space-x-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onAddSubtask}
+            className="hover:bg-[#154273]/10 text-[#154273]"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
           {isEditing && (
             <>
               <Button
@@ -90,14 +98,6 @@ const TaskCardHeader = ({
                 className="hover:bg-[#154273]/10 text-green-500"
               >
                 <Save className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onAddSubtask}
-                className="hover:bg-[#154273]/10 text-[#154273]"
-              >
-                <Plus className="h-4 w-4" />
               </Button>
               {onDelete && (
                 <Button
