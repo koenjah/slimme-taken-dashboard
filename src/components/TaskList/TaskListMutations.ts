@@ -14,22 +14,30 @@ export const fetchTasks = async (): Promise<Task[]> => {
   return data || [];
 };
 
-export const createTask = async (task: { name: string } & Partial<Omit<Task, 'id' | 'subtasks' | 'created_at'>>) => {
-  const { error } = await supabase
+export const createTask = async (taskData: Partial<Task>): Promise<Task> => {
+  if (!taskData.name) {
+    throw new Error('Task name is required');
+  }
+
+  const { data, error } = await supabase
     .from('tasks')
     .insert({
-      name: task.name,
-      description: task.description || '',
-      icon: task.icon || 'zap',
-      priority_score: task.priority_score || 1,
-      progress: task.progress || 0,
-      completed: task.completed || false,
-      due_date: task.due_date || null
-    });
+      name: taskData.name,
+      description: taskData.description || '',
+      icon: taskData.icon || 'zap',
+      priority_score: taskData.priority_score || 1,
+      progress: taskData.progress || 0,
+      completed: taskData.completed || false,
+      due_date: taskData.due_date || null,
+    })
+    .select('*')
+    .single();
+
   if (error) throw error;
+  return data;
 };
 
-export const updateTask = async (task: { id: number } & Partial<Omit<Task, 'subtasks' | 'created_at'>>) => {
+export const updateTask = async (task: { id: number } & Partial<Omit<Task, 'subtasks' | 'created_at'>>): Promise<void> => {
   const { error } = await supabase
     .from('tasks')
     .update(task)

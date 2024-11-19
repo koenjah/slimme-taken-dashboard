@@ -39,6 +39,7 @@ const TaskList = () => {
         title: "Taak toegevoegd",
         description: "De nieuwe taak is succesvol aangemaakt.",
       });
+      setIsAddingTask(false);
     },
   });
 
@@ -107,11 +108,7 @@ const TaskList = () => {
         onOpenChange={setIsAddingTask}
         onSubmit={(task) => {
           if (task.name) {
-            createTaskMutation.mutate({
-              name: task.name,
-              description: task.description,
-              icon: task.icon,
-            });
+            createTaskMutation.mutate(task);
           }
         }}
       />
