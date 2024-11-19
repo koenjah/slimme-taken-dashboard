@@ -86,6 +86,31 @@ const TaskList = () => {
     },
   });
 
+  const deleteSubtaskMutation = useMutation({
+    mutationFn: async (subtaskId: number) => {
+      const { error } = await supabase
+        .from('subtasks')
+        .delete()
+        .eq('id', subtaskId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast({
+        title: "Subtaak verwijderd",
+        description: "De subtaak is succesvol verwijderd.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: "Er is een fout opgetreden bij het verwijderen van de subtaak.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleTaskDragEnd = async (result: any) => {
     if (!result.destination || !tasks) return;
 
@@ -157,10 +182,7 @@ const TaskList = () => {
                         onTaskEdit={handleTaskUpdate}
                         onSubtaskUpdate={handleSubtaskUpdate}
                         onSubtaskDelete={(subtaskId) => {
-                          updateSubtaskMutation.mutate({
-                            id: subtaskId,
-                            archived: true
-                          });
+                          deleteSubtaskMutation.mutate(subtaskId);
                         }}
                         onTaskDelete={(taskId) => {
                           deleteTaskMutation.mutate(taskId);

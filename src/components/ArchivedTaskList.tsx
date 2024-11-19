@@ -3,6 +3,7 @@ import { Task } from "@/types";
 import TaskCard from "./TaskList/TaskCard";
 import { fetchArchivedTasks, updateTask, updateSubtask } from "./TaskList/mutations";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ArchivedTaskList = () => {
   const { toast } = useToast();
@@ -37,6 +38,31 @@ const ArchivedTaskList = () => {
     },
   });
 
+  const deleteSubtaskMutation = useMutation({
+    mutationFn: async (subtaskId: number) => {
+      const { error } = await supabase
+        .from('subtasks')
+        .delete()
+        .eq('id', subtaskId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['archivedTasks'] });
+      toast({
+        title: "Subtaak verwijderd",
+        description: "De subtaak is succesvol verwijderd.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: "Er is een fout opgetreden bij het verwijderen van de subtaak.",
+        variant: "destructive",
+      });
+    },
+  });
+
   if (isLoading) return <div className="animate-pulse">Archief Laden...</div>;
 
   return (
@@ -60,10 +86,7 @@ const ArchivedTaskList = () => {
               });
             }}
             onSubtaskDelete={(subtaskId) => {
-              updateSubtaskMutation.mutate({
-                id: subtaskId,
-                archived: true
-              });
+              deleteSubtaskMutation.mutate(subtaskId);
             }}
           />
         ))}
