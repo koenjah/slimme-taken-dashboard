@@ -86,11 +86,13 @@ const SubtaskItem = ({
             {subtask.name}
           </span>
           <div className="flex items-center gap-3">
-            <NotesDropdown
-              subtaskId={subtask.id}
-              notes={subtask.notes || []}
-              onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
-            />
+            {(subtask.notes?.length ?? 0) > 0 && (
+              <NotesDropdown
+                subtaskId={subtask.id}
+                notes={subtask.notes || []}
+                onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
+              />
+            )}
             <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
           </div>
         </>
