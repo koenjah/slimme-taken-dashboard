@@ -49,12 +49,9 @@ const SubtaskItem = ({
         aria-hidden={!isEditing}
       />
       <div className="flex items-center space-x-3 flex-1">
-        <div className="flex items-center space-x-2">
-          <ScoreBadge score={subtask.priority_score || 0} max={10} />
-          <span className={`text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
-            {subtask.name}
-          </span>
-        </div>
+        <span className={`text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
+          {subtask.name}
+        </span>
       </div>
       {isEditing && (
         <div className="flex items-center space-x-4 min-w-[200px]">
@@ -72,7 +69,10 @@ const SubtaskItem = ({
             step={1}
             className="flex-1"
           />
-          <ScoreBadge score={subtask.progress} max={100} variant="progress" className="ml-2" />
+          <div className="flex items-center space-x-2">
+            <ScoreBadge score={subtask.priority_score || 0} max={10} />
+            <ScoreBadge score={subtask.progress} max={100} variant="progress" />
+          </div>
           {onDelete && (
             <Button
               variant="ghost"

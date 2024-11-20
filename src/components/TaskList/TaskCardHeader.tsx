@@ -73,7 +73,6 @@ const TaskCardHeader = ({
           ) : (
             <div className="space-y-1">
               <div className="flex items-center space-x-3">
-                <ScoreBadge score={task.priority_score || 0} max={10} />
                 <h3 className="text-lg font-title text-[#154273]">
                   {task.name}
                 </h3>
@@ -92,10 +91,16 @@ const TaskCardHeader = ({
               step={1}
               className="flex-1"
             />
-            <ScoreBadge score={editedTask.progress} max={100} variant="progress" className="ml-2" />
+            <div className="flex items-center space-x-2">
+              <ScoreBadge score={editedTask.priority_score || 0} max={10} />
+              <ScoreBadge score={editedTask.progress} max={100} variant="progress" />
+            </div>
           </div>
         ) : (
-          <ScoreBadge score={task.progress} max={100} variant="progress" />
+          <div className="flex items-center space-x-2">
+            <ScoreBadge score={task.priority_score || 0} max={10} />
+            <ScoreBadge score={task.progress} max={100} variant="progress" />
+          </div>
         )}
         <div className="flex items-center space-x-2">
           <Button
