@@ -1,11 +1,9 @@
 import { Task } from "@/types";
-import { GripVertical, Save, Plus, Trash2 } from "lucide-react";
+import { Plus, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
-import { Slider } from "@/components/ui/slider";
-import ScoreBadge from "./Badges/ScoreBadge";
 import NotesDropdown from "./NotesDropdown";
+import ScoreBadge from "./Badges/ScoreBadge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +20,6 @@ interface TaskCardHeaderProps {
   task: Task;
   isEditing: boolean;
   editedTask: Task;
-  dragHandleProps?: DraggableProvidedDragHandleProps;
   onEditedTaskChange: (task: Task) => void;
   onSave: () => void;
   onAddSubtask: () => void;
@@ -34,7 +31,6 @@ const TaskCardHeader = ({
   task,
   isEditing,
   editedTask,
-  dragHandleProps,
   onEditedTaskChange,
   onSave,
   onAddSubtask,
@@ -46,9 +42,7 @@ const TaskCardHeader = ({
   return (
     <>
       <div className="flex flex-row items-center space-x-4 p-6">
-        <div {...dragHandleProps}>
-          <GripVertical className="h-5 w-5 text-gray-400 hover:text-[#154273] transition-colors" />
-        </div>
+        <ScoreBadge score={task.priority_score || 0} max={10} size="lg" />
         <div className="flex-1">
           {isEditing ? (
             <div className="space-y-2">
@@ -66,36 +60,6 @@ const TaskCardHeader = ({
                 </h3>
               </div>
             </div>
-          )}
-        </div>
-        <div className="flex items-center space-x-4">
-          {isEditing ? (
-            <Input
-              type="number"
-              min="0"
-              max="10"
-              value={editedTask.priority_score || 0}
-              onChange={(e) => {
-                const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
-                onEditedTaskChange({ ...editedTask, priority_score: value });
-              }}
-              className="w-20 text-center"
-            />
-          ) : (
-            <ScoreBadge score={task.priority_score || 0} max={10} size="lg" />
-          )}
-          {isEditing ? (
-            <Slider
-              value={[editedTask.progress]}
-              onValueChange={(value) => {
-                onEditedTaskChange({ ...editedTask, progress: value[0] });
-              }}
-              max={100}
-              step={1}
-              className="w-32"
-            />
-          ) : (
-            <ScoreBadge score={task.progress} max={100} variant="progress" size="lg" />
           )}
         </div>
         <div className="flex items-center space-x-2">

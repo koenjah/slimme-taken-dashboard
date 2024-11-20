@@ -31,29 +31,23 @@ const ScoreBadge = ({ score, max, variant = "priority", size = "lg", className }
     return lowerColor.color;
   };
 
-  const getProgressColor = (progress: number) => {
-    return `rgba(${progress < 50 ? '156, 163, 175' : '107, 114, 128'}, 0.2)`;
-  };
-
   const isProgress = variant === "progress";
   const normalizedScore = isProgress ? score : (score / max) * 10;
-  const backgroundColor = isProgress ? getProgressColor(score) : `${getPriorityColor(normalizedScore)}20`;
   const textColor = isProgress ? 'text-gray-600' : getPriorityColor(normalizedScore);
 
   const sizeClasses = {
-    sm: "w-10 h-10 text-sm",
-    lg: "w-16 h-16 text-xl"
+    sm: "text-sm",
+    lg: "text-xl"
   };
 
   return (
     <div
       className={cn(
-        "flex items-center justify-center rounded-full font-bold",
+        "flex items-center justify-center font-bold",
         sizeClasses[size],
         className
       )}
       style={{ 
-        backgroundColor,
         color: textColor,
       }}
     >
