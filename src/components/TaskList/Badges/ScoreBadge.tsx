@@ -42,7 +42,7 @@ const ScoreBadge = ({ score, max, variant = "priority", className }: ScoreBadgeP
   return (
     <div
       className={cn(
-        "flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold",
+        "flex items-center justify-center w-14 h-14 rounded-full text-lg font-bold",
         className
       )}
       style={{ 
