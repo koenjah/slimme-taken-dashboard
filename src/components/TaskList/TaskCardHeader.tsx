@@ -92,14 +92,14 @@ const TaskCardHeader = ({
               className="flex-1"
             />
             <div className="flex items-center space-x-2">
-              <ScoreBadge score={editedTask.priority_score || 0} max={10} />
-              <ScoreBadge score={editedTask.progress} max={100} variant="progress" />
+              <ScoreBadge score={editedTask.priority_score || 0} max={10} size="lg" />
+              <ScoreBadge score={editedTask.progress} max={100} variant="progress" size="lg" />
             </div>
           </div>
         ) : (
           <div className="flex items-center space-x-2">
-            <ScoreBadge score={task.priority_score || 0} max={10} />
-            <ScoreBadge score={task.progress} max={100} variant="progress" />
+            <ScoreBadge score={task.priority_score || 0} max={10} size="lg" />
+            <ScoreBadge score={task.progress} max={100} variant="progress" size="lg" />
           </div>
         )}
         <div className="flex items-center space-x-2">

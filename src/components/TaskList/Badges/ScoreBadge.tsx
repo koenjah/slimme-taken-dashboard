@@ -4,10 +4,11 @@ interface ScoreBadgeProps {
   score: number;
   max: number;
   variant?: "priority" | "progress";
+  size?: "sm" | "lg";
   className?: string;
 }
 
-const ScoreBadge = ({ score, max, variant = "priority", className }: ScoreBadgeProps) => {
+const ScoreBadge = ({ score, max, variant = "priority", size = "lg", className }: ScoreBadgeProps) => {
   const getPriorityColor = (score: number) => {
     // Reversed color scale: red (0) to green (10)
     const colors = {
@@ -39,10 +40,16 @@ const ScoreBadge = ({ score, max, variant = "priority", className }: ScoreBadgeP
   const backgroundColor = isProgress ? getProgressColor(score) : `${getPriorityColor(normalizedScore)}20`;
   const textColor = isProgress ? 'text-gray-600' : getPriorityColor(normalizedScore);
 
+  const sizeClasses = {
+    sm: "w-10 h-10 text-sm",
+    lg: "w-16 h-16 text-xl"
+  };
+
   return (
     <div
       className={cn(
-        "flex items-center justify-center w-14 h-14 rounded-full text-lg font-bold",
+        "flex items-center justify-center rounded-full font-bold",
+        sizeClasses[size],
         className
       )}
       style={{ 
