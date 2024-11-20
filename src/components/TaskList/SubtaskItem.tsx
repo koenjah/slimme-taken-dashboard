@@ -96,15 +96,15 @@ const SubtaskItem = ({
                 name: e.target.value,
               });
             }}
-            className="flex-1 min-w-[200px]"
+            className="flex-1"
           />
         ) : (
-          <span className={`flex-1 min-w-[200px] ${subtask.completed ? 'line-through' : ''}`}>
+          <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
             {subtask.name}
           </span>
         )}
-        <div className="flex items-center space-x-4 min-w-[200px] justify-end">
-          {isEditing && (!subtask.notes || subtask.notes.length === 0) && (
+        <div className="flex items-center space-x-4">
+          {isEditing && (
             <Button
               variant="ghost"
               size="icon"
@@ -114,13 +114,13 @@ const SubtaskItem = ({
               <MessageSquare className="h-4 w-4" />
             </Button>
           )}
-          <div className="flex items-center space-x-2 min-w-[100px]">
+          <div className="flex items-center space-x-2">
             <NotesDropdown
               subtaskId={subtask.id}
               notes={subtask.notes || []}
               onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
             />
-            <span className="text-sm font-medium text-gray-600 w-12 text-right">{subtask.progress}%</span>
+            <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
           </div>
           {isEditing ? (
             <Slider
