@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Pencil, Trash2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Note } from "@/types";
@@ -16,6 +16,8 @@ interface NotesDropdownProps {
 const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [newNote, setNewNote] = useState("");
+  const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
+  const [editedContent, setEditedContent] = useState("");
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -29,8 +31,8 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       if (subtaskDiv) {
         const subtaskRect = subtaskDiv.getBoundingClientRect();
         setDropdownPosition({
-          top: subtaskRect.bottom + window.scrollY + 8, // 8px offset from bottom of subtask
-          left: subtaskRect.left + window.scrollX, // Align with left edge of subtask
+          top: subtaskRect.bottom + window.scrollY + 8,
+          left: subtaskRect.left + window.scrollX,
         });
       }
     }
@@ -46,6 +48,7 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
         !buttonRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
+        setEditingNoteId(null);
       }
     };
 
@@ -89,6 +92,35 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
     }
   };
 
+  const handleEditNote = async (noteId: number) => {
+    if (!editedContent.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from('notes')
+        .update({ content: editedContent.trim() })
+        .eq('id', noteId);
+
+      if (error) throw error;
+
+      onNotesChange(notes.map(note => 
+        note.id === noteId ? { ...note, content: editedContent.trim() } : note
+      ));
+      setEditingNoteId(null);
+      setEditedContent("");
+      toast({
+        title: "Notitie bijgewerkt",
+        description: "De notitie is succesvol bijgewerkt.",
+      });
+    } catch (error) {
+      toast({
+        title: "Fout bij bewerken",
+        description: "Er is een fout opgetreden bij het bewerken van de notitie.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleDeleteNote = async (noteId: number) => {
     try {
       const { error } = await supabase
@@ -110,6 +142,16 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
         variant: "destructive",
       });
     }
+  };
+
+  const startEditing = (note: Note) => {
+    setEditingNoteId(note.id);
+    setEditedContent(note.content);
+  };
+
+  const cancelEditing = () => {
+    setEditingNoteId(null);
+    setEditedContent("");
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -143,24 +185,78 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
             left: `${dropdownPosition.left}px`,
           }}
         >
-          {notes.map((note) => (
-            <div key={note.id} className="group flex items-start space-x-2">
-              <p className="flex-1 text-sm text-gray-700">{note.content}</p>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteNote(note.id);
-                }}
-                className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-600 hover:bg-red-50"
-              >
-                ×
-              </Button>
-            </div>
-          ))}
+          <div className="space-y-4">
+            {notes.map((note) => (
+              <div key={note.id} className="group flex items-start space-x-2 p-2 rounded-md hover:bg-gray-50">
+                {editingNoteId === note.id ? (
+                  <div className="flex-1 space-y-2">
+                    <Textarea
+                      value={editedContent}
+                      onChange={(e) => setEditedContent(e.target.value)}
+                      className="min-h-[60px] text-sm"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditNote(note.id);
+                        }}
+                        className="text-green-600 hover:text-green-700"
+                      >
+                        <Check className="h-4 w-4 mr-1" />
+                        Opslaan
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          cancelEditing();
+                        }}
+                        className="text-gray-600 hover:text-gray-700"
+                      >
+                        <X className="h-4 w-4 mr-1" />
+                        Annuleren
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="flex-1 text-sm text-gray-700">{note.content}</p>
+                    <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          startEditing(note);
+                        }}
+                        className="text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteNote(note.id);
+                        }}
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
           
-          <div className="space-y-2">
+          <div className="space-y-2 pt-4 border-t border-gray-100">
             <Textarea
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
