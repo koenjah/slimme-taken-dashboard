@@ -54,7 +54,7 @@ const SubtaskList = ({
                   <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
-                    className={`flex items-center space-x-3 p-2 bg-white rounded-md shadow-sm border border-gray-100 hover:border-[#154273]/20 transition-all group ${!isEditing ? 'focus:outline-none' : ''}`}
+                    className={`flex items-center space-x-3 p-2 bg-white rounded-md shadow-sm border border-gray-100 hover:border-[#154273]/20 transition-all group ${!isEditing ? 'pointer-events-none' : ''}`}
                   >
                     {isEditing && (
                       <div {...provided.dragHandleProps}>
@@ -77,9 +77,8 @@ const SubtaskList = ({
                           );
                         }
                       }}
-                      className={`data-[state=checked]:bg-[#154273] ${!isEditing ? 'focus:outline-none focus:ring-0 focus:ring-offset-0' : ''}`}
-                      tabIndex={isEditing ? 0 : -1}
-                      disabled={!isEditing}
+                      className={`${!isEditing ? 'pointer-events-none' : ''} data-[state=checked]:bg-[#154273]`}
+                      tabIndex={-1}
                     />
                     {isEditing ? (
                       <Input
@@ -94,7 +93,7 @@ const SubtaskList = ({
                         className="flex-1"
                       />
                     ) : (
-                      <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''} pointer-events-none select-none`}>
+                      <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''} select-none`}>
                         {subtask.name}
                       </span>
                     )}
@@ -128,7 +127,7 @@ const SubtaskList = ({
                         )}
                       </div>
                     ) : (
-                      <span className="text-sm font-medium text-gray-500 pointer-events-none select-none">
+                      <span className="text-sm font-medium text-gray-500 select-none">
                         {subtask.progress}%
                       </span>
                     )}
