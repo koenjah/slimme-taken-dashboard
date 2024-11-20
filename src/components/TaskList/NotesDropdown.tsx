@@ -12,9 +12,10 @@ interface NotesDropdownProps {
   subtaskId?: number;
   notes: Note[];
   onNotesChange: (notes: Note[]) => void;
+  isEditing?: boolean; // Add isEditing prop
 }
 
-const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdownProps) => {
+const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange, isEditing = false }: NotesDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [newNote, setNewNote] = useState("");
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -127,7 +128,8 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
     setIsOpen(!isOpen);
   };
 
-  if (!isOpen && notes.length === 0) return null;
+  // Show if in edit mode OR if there are notes
+  if (!isEditing && notes.length === 0) return null;
 
   return (
     <div className="relative">

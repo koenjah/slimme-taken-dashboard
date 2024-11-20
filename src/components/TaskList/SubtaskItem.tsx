@@ -82,6 +82,7 @@ const SubtaskItem = ({
               subtaskId={subtask.id}
               notes={subtask.notes || []}
               onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
+              isEditing={isEditing}
             />
           </div>
           {isEditing ? (
