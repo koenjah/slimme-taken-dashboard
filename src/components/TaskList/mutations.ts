@@ -32,17 +32,18 @@ export const fetchTasks = async (): Promise<Task[]> => {
 };
 
 export const fetchArchivedTasks = async (): Promise<Task[]> => {
-  // Fetch archived tasks and their subtasks (both archived and non-archived)
-  const { data: tasks, error: tasksError } = await supabase
+  // Fetch all tasks that either:
+  // 1. Are archived themselves
+  // 2. Have archived subtasks
+  const { data: allTasks, error: tasksError } = await supabase
     .from('tasks')
     .select('*')
-    .eq('archived', true)
     .order('created_at', { ascending: false });
 
   if (tasksError) throw tasksError;
 
   const tasksWithSubtasks = await Promise.all(
-    (tasks || []).map(async (task) => {
+    (allTasks || []).map(async (task) => {
       const { data: subtasks, error: subtasksError } = await supabase
         .from('subtasks')
         .select('*')
@@ -58,37 +59,10 @@ export const fetchArchivedTasks = async (): Promise<Task[]> => {
     })
   );
 
-  // Also fetch tasks with archived subtasks
-  const { data: tasksWithArchivedSubtasks, error: nonArchivedTasksError } = await supabase
-    .from('tasks')
-    .select('*')
-    .eq('archived', false)
-    .order('created_at', { ascending: false });
-
-  if (nonArchivedTasksError) throw nonArchivedTasksError;
-
-  const additionalTasks = await Promise.all(
-    (tasksWithArchivedSubtasks || []).map(async (task) => {
-      const { data: subtasks, error: subtasksError } = await supabase
-        .from('subtasks')
-        .select('*')
-        .eq('task_id', task.id)
-        .eq('archived', true)
-        .order('created_at', { ascending: false });
-
-      if (subtasksError) throw subtasksError;
-
-      if (!subtasks || subtasks.length === 0) return null;
-
-      return {
-        ...task,
-        subtasks: subtasks,
-      };
-    })
+  // Filter tasks to only include those that are archived or have archived subtasks
+  return tasksWithSubtasks.filter(task => 
+    task.archived || task.subtasks.some(subtask => subtask.archived)
   );
-
-  const filteredAdditionalTasks = additionalTasks.filter((task): task is Task => task !== null);
-  return [...tasksWithSubtasks, ...filteredAdditionalTasks];
 };
 
 export const updateTask = async (task: Partial<Task> & { id: number }): Promise<void> => {

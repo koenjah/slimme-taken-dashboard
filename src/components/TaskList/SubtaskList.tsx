@@ -72,6 +72,7 @@ const SubtaskList = ({
                           ...subtask,
                           completed: checked as boolean,
                           progress: checked ? 100 : 0,
+                          archived: checked as boolean, // Add archived status when completed
                         };
                         if (!isEditing) {
                           onSubtaskUpdate(updatedSubtask);
@@ -109,7 +110,12 @@ const SubtaskList = ({
                           onValueChange={(value) => {
                             onSubtasksChange(
                               editedSubtasks.map(s =>
-                                s.id === subtask.id ? { ...s, progress: value[0], completed: value[0] === 100 } : s
+                                s.id === subtask.id ? { 
+                                  ...s, 
+                                  progress: value[0], 
+                                  completed: value[0] === 100,
+                                  archived: value[0] === 100 // Add archived status when progress is 100%
+                                } : s
                               )
                             );
                           }}

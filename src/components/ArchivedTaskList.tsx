@@ -4,10 +4,23 @@ import TaskCard from "./TaskList/TaskCard";
 import { fetchArchivedTasks, updateTask, updateSubtask } from "./TaskList/mutations";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 const ArchivedTaskList = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ id: number, type: 'task' | 'subtask' } | null>(null);
 
   const { data: archivedTasks, isLoading } = useQuery({
     queryKey: ['archivedTasks'],
@@ -38,7 +51,7 @@ const ArchivedTaskList = () => {
     },
   });
 
-  const deleteSubtaskMutation = useMutation({
+  const permanentlyDeleteSubtaskMutation = useMutation({
     mutationFn: async (subtaskId: number) => {
       const { error } = await supabase
         .from('subtasks')
@@ -51,7 +64,7 @@ const ArchivedTaskList = () => {
       queryClient.invalidateQueries({ queryKey: ['archivedTasks'] });
       toast({
         title: "Subtaak verwijderd",
-        description: "De subtaak is succesvol verwijderd.",
+        description: "De subtaak is permanent verwijderd.",
       });
     },
     onError: () => {
@@ -62,6 +75,52 @@ const ArchivedTaskList = () => {
       });
     },
   });
+
+  const permanentlyDeleteTaskMutation = useMutation({
+    mutationFn: async (taskId: number) => {
+      // First delete all subtasks
+      const { error: subtasksError } = await supabase
+        .from('subtasks')
+        .delete()
+        .eq('task_id', taskId);
+
+      if (subtasksError) throw subtasksError;
+
+      // Then delete the task
+      const { error: taskError } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', taskId);
+
+      if (taskError) throw taskError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['archivedTasks'] });
+      toast({
+        title: "Taak verwijderd",
+        description: "De taak en bijbehorende subtaken zijn permanent verwijderd.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: "Er is een fout opgetreden bij het verwijderen van de taak.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDelete = () => {
+    if (!itemToDelete) return;
+
+    if (itemToDelete.type === 'task') {
+      permanentlyDeleteTaskMutation.mutate(itemToDelete.id);
+    } else {
+      permanentlyDeleteSubtaskMutation.mutate(itemToDelete.id);
+    }
+    setDeleteDialogOpen(false);
+    setItemToDelete(null);
+  };
 
   if (isLoading) return <div className="animate-pulse">Archief Laden...</div>;
 
@@ -86,11 +145,39 @@ const ArchivedTaskList = () => {
               });
             }}
             onSubtaskDelete={(subtaskId) => {
-              deleteSubtaskMutation.mutate(subtaskId);
+              setItemToDelete({ id: subtaskId, type: 'subtask' });
+              setDeleteDialogOpen(true);
+            }}
+            onTaskDelete={(taskId) => {
+              setItemToDelete({ id: taskId, type: 'task' });
+              setDeleteDialogOpen(true);
             }}
           />
         ))}
       </div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Weet je zeker dat je dit {itemToDelete?.type === 'task' ? 'deze taak' : 'deze subtaak'} permanent wilt verwijderen?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Deze actie kan niet ongedaan worden gemaakt.
+              {itemToDelete?.type === 'task' && ' Alle bijbehorende subtaken worden ook verwijderd.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Verwijderen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
