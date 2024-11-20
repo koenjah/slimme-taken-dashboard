@@ -31,7 +31,7 @@ const NoteItem = ({ note, onEdit, onDelete }: NoteItemProps) => {
           <Textarea
             value={editedContent}
             onChange={(e) => setEditedContent(e.target.value)}
-            className="min-h-[60px] text-sm resize-none"
+            className="min-h-[60px] text-sm resize-none leading-normal"
             onClick={(e) => e.stopPropagation()}
           />
           <div className="flex space-x-2">
@@ -63,7 +63,7 @@ const NoteItem = ({ note, onEdit, onDelete }: NoteItemProps) => {
         </div>
       ) : (
         <>
-          <div className="flex-1 max-h-[200px] overflow-y-auto">
+          <div className="flex-1 max-h-[200px] overflow-y-auto leading-normal">
             <p className="text-sm text-gray-700 whitespace-pre-wrap break-words pr-2">
               {note.content}
             </p>
