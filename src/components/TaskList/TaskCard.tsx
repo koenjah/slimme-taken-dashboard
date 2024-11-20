@@ -31,14 +31,11 @@ const TaskCard = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Sync editedSubtasks when task.subtasks changes
   useEffect(() => {
-    if (!isEditing) {
-      setEditedSubtasks(
-        [...(task.subtasks || [])].sort((a, b) => (a.priority_score || 0) - (b.priority_score || 0))
-      );
-    }
-  }, [task.subtasks, isEditing]);
+    setEditedSubtasks(
+      [...(task.subtasks || [])].sort((a, b) => (a.priority_score || 0) - (b.priority_score || 0))
+    );
+  }, [task.subtasks]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -117,21 +114,20 @@ const TaskCard = ({
     setDeletedSubtaskIds(prev => [...prev, subtaskId]);
   };
 
-  const handleSubtaskUpdate = (updatedSubtask: Subtask) => {
-    setEditedSubtasks(prev => 
-      prev.map(s => s.id === updatedSubtask.id ? updatedSubtask : s)
-    );
+  const handleSubtaskClick = (e: React.MouseEvent) => {
+    // Check if the click is coming from the notes icon or dropdown
+    if (!(e.target as HTMLElement).closest('.notes-dropdown')) {
+      if (!isEditing) {
+        setIsEditing(true);
+      }
+    }
   };
 
   return (
     <Card 
       ref={cardRef}
       className="w-full animate-fade-in border-l-4 border-l-[#154273] bg-white hover:shadow-md transition-all duration-200"
-      onClick={(e) => {
-        if (!isEditing && !(e.target as HTMLElement).closest('.notes-dropdown')) {
-          setIsEditing(true);
-        }
-      }}
+      onClick={handleSubtaskClick}
     >
       <TaskCardHeader
         task={task}
@@ -155,7 +151,7 @@ const TaskCard = ({
             isEditing={isEditing}
             editedSubtasks={editedSubtasks}
             onSubtasksChange={setEditedSubtasks}
-            onSubtaskUpdate={handleSubtaskUpdate}
+            onSubtaskUpdate={onSubtaskUpdate}
             onSubtaskDelete={handleSubtaskDelete}
           />
         )}
