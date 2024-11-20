@@ -1,13 +1,13 @@
 import { Subtask } from "@/types";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import SubtaskItem from "./SubtaskItem";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 interface SubtaskListProps {
   taskId: number;
   isEditing: boolean;
   editedSubtasks: Subtask[];
   onSubtasksChange: (subtasks: Subtask[]) => void;
-  onSubtaskUpdate: (subtask: { id: number } & Partial<Subtask>) => void;
+  onSubtaskUpdate: (subtask: Subtask) => void;
   onSubtaskDelete?: (subtaskId: number) => void;
 }
 
@@ -17,37 +17,36 @@ const SubtaskList = ({
   editedSubtasks,
   onSubtasksChange,
   onSubtaskUpdate,
-  onSubtaskDelete
+  onSubtaskDelete,
 }: SubtaskListProps) => {
-  const handleSubtaskDragEnd = (result: any) => {
+  const handleDragEnd = (result: any) => {
     if (!result.destination) return;
 
-    const items = Array.from(editedSubtasks);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+    const sourceIndex = result.source.index;
+    const destIndex = result.destination.index;
 
-    // Update priority scores: lower index = lower number = higher priority
-    const updatedItems = items.map((item, index) => ({
-      ...item,
+    const newSubtasks = Array.from(editedSubtasks);
+    const [removed] = newSubtasks.splice(sourceIndex, 1);
+    newSubtasks.splice(destIndex, 0, removed);
+
+    // Update priority scores
+    const updatedSubtasks = newSubtasks.map((subtask, index) => ({
+      ...subtask,
       priority_score: index + 1,
     }));
 
-    onSubtasksChange(updatedItems);
+    onSubtasksChange(updatedSubtasks);
   };
 
   return (
-    <DragDropContext onDragEnd={handleSubtaskDragEnd}>
-      <Droppable droppableId={`subtasks-${taskId}`} isDropDisabled={!isEditing}>
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <Droppable droppableId={`subtasks-${taskId}`}>
         {(provided) => (
-          <div 
-            {...provided.droppableProps} 
-            ref={provided.innerRef} 
-            className={`space-y-2 ${!isEditing ? 'select-none' : ''}`}
-          >
+          <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
             {editedSubtasks.map((subtask, index) => (
-              <Draggable 
-                key={subtask.id} 
-                draggableId={`subtask-${subtask.id}`} 
+              <Draggable
+                key={subtask.id}
+                draggableId={subtask.id.toString()}
                 index={index}
                 isDragDisabled={!isEditing}
               >
@@ -55,21 +54,12 @@ const SubtaskList = ({
                   <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
+                    {...provided.dragHandleProps}
                   >
                     <SubtaskItem
                       subtask={subtask}
                       isEditing={isEditing}
-                      dragHandleProps={provided.dragHandleProps}
-                      onUpdate={(updatedSubtask) => {
-                        if (!isEditing) {
-                          onSubtaskUpdate(updatedSubtask);
-                        } else {
-                          const newSubtasks = editedSubtasks.map(s => 
-                            s.id === updatedSubtask.id ? { ...s, ...updatedSubtask } : s
-                          );
-                          onSubtasksChange(newSubtasks);
-                        }
-                      }}
+                      onUpdate={onSubtaskUpdate}
                       onDelete={onSubtaskDelete}
                     />
                   </div>

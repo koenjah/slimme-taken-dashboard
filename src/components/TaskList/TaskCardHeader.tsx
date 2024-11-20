@@ -2,6 +2,7 @@ import { Task } from "@/types";
 import { Plus, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import NotesDropdown from "./NotesDropdown";
 import ScoreBadge from "./Badges/ScoreBadge";
 import {
@@ -41,82 +42,102 @@ const TaskCardHeader = ({
 
   return (
     <>
-      <div className="flex flex-row items-center space-x-4 p-6">
-        {isEditing ? (
-          <Input
-            type="number"
-            min="0"
-            max="10"
-            value={editedTask.priority_score || 0}
-            onChange={(e) => {
-              const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
-              onEditedTaskChange({ ...editedTask, priority_score: value });
-            }}
-            className="w-16 text-center"
-          />
-        ) : (
-          <ScoreBadge score={task.priority_score || 0} max={10} size="lg" />
-        )}
-        <div className="flex-1">
+      <div className="flex flex-col space-y-4 p-6">
+        <div className="flex flex-row items-center space-x-4">
           {isEditing ? (
-            <div className="space-y-2">
-              <Input
-                value={editedTask.name}
-                onChange={(e) => onEditedTaskChange({ ...editedTask, name: e.target.value })}
-                className="font-title text-lg text-[#154273]"
-              />
-            </div>
+            <Input
+              type="number"
+              min="0"
+              max="10"
+              value={editedTask.priority_score || 0}
+              onChange={(e) => {
+                const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
+                onEditedTaskChange({ ...editedTask, priority_score: value });
+              }}
+              className="w-16 text-center"
+            />
           ) : (
-            <div className="space-y-1">
-              <div className="flex items-center space-x-3">
-                <h3 className="text-lg font-title text-[#154273]">
-                  {task.name}
-                </h3>
-              </div>
-            </div>
+            <ScoreBadge score={task.priority_score || 0} max={10} size="lg" />
           )}
-        </div>
-        <div className="flex items-center space-x-2">
-          <NotesDropdown
-            taskId={task.id}
-            notes={isEditing ? editedTask.notes || [] : task.notes || []}
-            onNotesChange={(notes) => {
-              if (isEditing) {
-                onEditedTaskChange({ ...editedTask, notes });
-              }
-            }}
-          />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onAddSubtask}
-            className="hover:bg-[#154273]/10 text-[#154273]"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-          {isEditing && (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onSave}
-                className="hover:bg-[#154273]/10 text-green-500"
-              >
-                <Save className="h-4 w-4" />
-              </Button>
-              {onDelete && (
+          <div className="flex-1">
+            {isEditing ? (
+              <div className="space-y-2">
+                <Input
+                  value={editedTask.name}
+                  onChange={(e) => onEditedTaskChange({ ...editedTask, name: e.target.value })}
+                  className="font-title text-lg text-[#154273]"
+                />
+              </div>
+            ) : (
+              <div className="space-y-1">
+                <div className="flex items-center space-x-3">
+                  <h3 className="text-lg font-title text-[#154273]">
+                    {task.name}
+                  </h3>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center space-x-2">
+            <NotesDropdown
+              taskId={task.id}
+              notes={isEditing ? editedTask.notes || [] : task.notes || []}
+              onNotesChange={(notes) => {
+                if (isEditing) {
+                  onEditedTaskChange({ ...editedTask, notes });
+                }
+              }}
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onAddSubtask}
+              className="hover:bg-[#154273]/10 text-[#154273]"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+            {isEditing && (
+              <>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setShowDeleteDialog(true)}
-                  className="hover:bg-red-50 text-red-500"
+                  onClick={onSave}
+                  className="hover:bg-[#154273]/10 text-green-500"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Save className="h-4 w-4" />
                 </Button>
-              )}
-            </>
-          )}
+                {onDelete && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowDeleteDialog(true)}
+                    className="hover:bg-red-50 text-red-500"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
         </div>
+        {isEditing && (
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-gray-500 w-16 text-center">{editedTask.progress}%</span>
+            <Slider
+              value={[editedTask.progress]}
+              onValueChange={(value) => {
+                onEditedTaskChange({
+                  ...editedTask,
+                  progress: value[0],
+                  completed: value[0] === 100,
+                });
+              }}
+              max={100}
+              step={1}
+              className="flex-1"
+            />
+          </div>
+        )}
       </div>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
