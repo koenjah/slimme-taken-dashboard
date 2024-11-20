@@ -27,8 +27,9 @@ const Index = () => {
       <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid gap-8">
           {showArchive ? (
-            <div className="space-y-6">
-              <div className="flex justify-end">
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold text-[#154273] font-title">Archief</h2>
                 <Button
                   variant="ghost"
                   size="icon"

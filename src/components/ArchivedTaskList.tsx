@@ -78,7 +78,6 @@ const ArchivedTaskList = () => {
 
   const permanentlyDeleteTaskMutation = useMutation({
     mutationFn: async (taskId: number) => {
-      // First delete all subtasks
       const { error: subtasksError } = await supabase
         .from('subtasks')
         .delete()
@@ -86,7 +85,6 @@ const ArchivedTaskList = () => {
 
       if (subtasksError) throw subtasksError;
 
-      // Then delete the task
       const { error: taskError } = await supabase
         .from('tasks')
         .delete()
@@ -124,11 +122,19 @@ const ArchivedTaskList = () => {
 
   if (isLoading) return <div className="animate-pulse">Archief Laden...</div>;
 
+  // Filter tasks to only include those with completed subtasks
+  const tasksWithCompletedSubtasks = archivedTasks?.filter(task => 
+    task.subtasks?.some(subtask => subtask.completed)
+  ).map(task => ({
+    ...task,
+    subtasks: task.subtasks?.filter(subtask => subtask.completed)
+  }));
+
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-primary">Archief</h2>
+    <div>
+      <h2 className="text-2xl font-semibold text-primary mb-6">Archief</h2>
       <div className="space-y-4">
-        {archivedTasks?.map((task) => (
+        {tasksWithCompletedSubtasks?.map((task) => (
           <TaskCard
             key={task.id}
             task={task}
