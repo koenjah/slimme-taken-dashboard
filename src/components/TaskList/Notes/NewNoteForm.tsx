@@ -1,29 +1,25 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 interface NewNoteFormProps {
-  newNote: string;
-  onNewNoteChange: (value: string) => void;
-  onAddNote: () => void;
+  value: string;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
 }
 
-const NewNoteForm = ({ newNote, onNewNoteChange, onAddNote }: NewNoteFormProps) => {
+const NewNoteForm = ({ value, onChange, onSubmit }: NewNoteFormProps) => {
   return (
-    <div className="space-y-2 pt-4 border-t border-gray-100">
+    <div className="space-y-2 pt-2 border-t border-gray-100">
       <Textarea
-        value={newNote}
-        onChange={(e) => onNewNoteChange(e.target.value)}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         placeholder="Voeg een notitie toe..."
-        className="min-h-[60px] text-sm resize-none"
-        onClick={(e) => e.stopPropagation()}
+        className="min-h-[80px] text-sm w-full resize-none"
+        style={{ maxHeight: '200px', overflowY: 'auto', overflowX: 'hidden', wordWrap: 'break-word' }}
       />
       <Button
-        onClick={(e) => {
-          e.stopPropagation();
-          onAddNote();
-        }}
-        disabled={!newNote.trim()}
+        onClick={onSubmit}
+        disabled={!value.trim()}
         size="sm"
         className="w-full"
       >
