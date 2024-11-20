@@ -17,9 +17,25 @@ interface NotesDropdownProps {
 const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [newNote, setNewNote] = useState("");
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Update dropdown position when opened
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      const subtaskDiv = buttonRef.current.closest('.subtask-container');
+      if (subtaskDiv) {
+        const subtaskRect = subtaskDiv.getBoundingClientRect();
+        setDropdownPosition({
+          top: subtaskRect.bottom + window.scrollY + 8,
+          left: subtaskRect.left + window.scrollX,
+        });
+      }
+    }
+  }, [isOpen]);
 
   // Handle clicks outside dropdown
   useEffect(() => {
@@ -147,10 +163,10 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       {isOpen && (
         <div 
           ref={dropdownRef}
-          className="absolute z-50 w-full max-w-[500px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 overflow-y-auto overflow-x-hidden"
+          className="fixed z-50 w-full max-w-[500px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 overflow-y-auto overflow-x-hidden"
           style={{ 
-            top: '100%',
-            right: 0,
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
             maxHeight: '60vh',
           }}
         >
