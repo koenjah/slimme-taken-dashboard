@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,7 +16,43 @@ interface NotesDropdownProps {
 const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [newNote, setNewNote] = useState("");
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Position dropdown below the button
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: buttonRect.bottom + window.scrollY + 8, // 8px offset
+        left: buttonRect.left + window.scrollX - (40 * 16 / 2) + (buttonRect.width / 2), // Center the 40rem dropdown
+      });
+    }
+  }, [isOpen]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   const handleAddNote = async () => {
     if (!newNote.trim()) return;
@@ -82,6 +118,7 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
   return (
     <div className="relative">
       <Button
+        ref={buttonRef}
         variant="ghost"
         size="sm"
         onClick={handleClick}
@@ -94,11 +131,14 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       </Button>
 
       {isOpen && (
-        <div className="fixed z-50 w-[40rem] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4" style={{ 
-          top: 'calc(100% + 0.5rem)',
-          left: '50%',
-          transform: 'translateX(-50%)'
-        }}>
+        <div 
+          ref={dropdownRef}
+          className="fixed z-50 w-[40rem] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4"
+          style={{ 
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+          }}
+        >
           {notes.map((note) => (
             <div key={note.id} className="group flex items-start space-x-2">
               <p className="flex-1 text-sm text-gray-700">{note.content}</p>
