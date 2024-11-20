@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import ScoreBadge from "./Badges/ScoreBadge";
 import NotesDropdown from "./NotesDropdown";
 
 interface SubtaskItemProps {
@@ -45,14 +46,7 @@ const SubtaskItem = ({
           className="w-16 text-center"
         />
       ) : (
-        <div {...dragHandleProps} className="cursor-grab">
-          <Input
-            type="number"
-            value={subtask.priority_score || 0}
-            className="w-16 text-center cursor-grab"
-            readOnly
-          />
-        </div>
+        <ScoreBadge score={subtask.priority_score || 0} max={10} size="sm" />
       )}
       <div className="subtask-container flex-1 flex items-center space-x-3 p-2 bg-white/80 rounded-md shadow-sm border border-gray-100">
         <Checkbox
@@ -78,13 +72,13 @@ const SubtaskItem = ({
               }}
               className="flex-1"
             />
-            <div className="notes-dropdown">
-              <NotesDropdown
-                subtaskId={subtask.id}
-                notes={subtask.notes || []}
-                onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
-              />
-            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hover:bg-[#154273]/10 text-[#154273]"
+            >
+              <MessageSquare className="h-4 w-4" />
+            </Button>
             <Slider
               value={[subtask.progress]}
               onValueChange={(value) => {
