@@ -103,7 +103,7 @@ const SubtaskItem = ({
             {subtask.name}
           </span>
         )}
-        <div className="flex items-center space-x-4 min-w-[250px] justify-end">
+        <div className="flex items-center justify-end min-w-[250px] relative pr-10">
           {isEditing && (!subtask.notes || subtask.notes.length === 0) && (
             <Button
               variant="ghost"
@@ -114,13 +114,15 @@ const SubtaskItem = ({
               <MessageSquare className="h-4 w-4" />
             </Button>
           )}
-          <div className="flex items-center space-x-2 min-w-[100px]">
-            <NotesDropdown
-              subtaskId={subtask.id}
-              notes={subtask.notes || []}
-              onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
-            />
-            <span className="text-sm font-medium text-gray-600 w-12 text-right">{subtask.progress}%</span>
+          <div className="flex items-center gap-2.5 absolute right-10">
+            {(subtask.notes?.length ?? 0) > 0 && (
+              <NotesDropdown
+                subtaskId={subtask.id}
+                notes={subtask.notes || []}
+                onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
+              />
+            )}
+            <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
           </div>
           {isEditing ? (
             <Slider
