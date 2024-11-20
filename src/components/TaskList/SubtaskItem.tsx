@@ -1,5 +1,5 @@
 import { Subtask } from "@/types";
-import { Trash2, MessageCircle } from "lucide-react";
+import { Trash2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -72,13 +72,13 @@ const SubtaskItem = ({
               }}
               className="flex-1"
             />
-            <div className="notes-dropdown">
-              <NotesDropdown
-                subtaskId={subtask.id}
-                notes={subtask.notes || []}
-                onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
-              />
-            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hover:bg-[#154273]/10 text-[#154273]"
+            >
+              <MessageSquare className="h-4 w-4" />
+            </Button>
             <Slider
               value={[subtask.progress]}
               onValueChange={(value) => {
