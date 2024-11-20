@@ -40,9 +40,22 @@ const SubtaskItem = ({
         }}
         className="data-[state=checked]:bg-primary"
       />
-      <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
-        {subtask.name}
-      </span>
+      {isEditing ? (
+        <Input
+          value={subtask.name}
+          onChange={(e) => {
+            onUpdate({
+              ...subtask,
+              name: e.target.value,
+            });
+          }}
+          className="flex-1"
+        />
+      ) : (
+        <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
+          {subtask.name}
+        </span>
+      )}
       <div className="flex items-center space-x-4">
         {isEditing ? (
           <Input
