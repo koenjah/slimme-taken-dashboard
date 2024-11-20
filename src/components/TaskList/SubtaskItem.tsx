@@ -1,5 +1,5 @@
 import { Subtask } from "@/types";
-import { Trash2 } from "lucide-react";
+import { Trash2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -84,7 +84,7 @@ const SubtaskItem = ({
               onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
             />
           </div>
-          {isEditing ? (
+          {isEditing && (
             <Slider
               value={[subtask.progress]}
               onValueChange={(value) => {
@@ -98,7 +98,8 @@ const SubtaskItem = ({
               step={1}
               className="w-24"
             />
-          ) : (
+          )}
+          {!isEditing && (
             <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
           )}
         </div>
