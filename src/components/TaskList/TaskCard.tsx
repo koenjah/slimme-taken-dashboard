@@ -1,7 +1,6 @@
 import { Task, Subtask } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 import { useState, useRef, useEffect } from "react";
 import TaskCardHeader from "./TaskCardHeader";
 import SubtaskList from "./SubtaskList";
@@ -10,7 +9,6 @@ import { useToast } from "@/components/ui/use-toast";
 
 interface TaskCardProps {
   task: Task;
-  dragHandleProps?: DraggableProvidedDragHandleProps;
   onTaskEdit: (task: Task) => void;
   onSubtaskUpdate: (subtask: { id: number } & Partial<Subtask>) => void;
   onSubtaskDelete?: (subtaskId: number) => void;
@@ -19,7 +17,6 @@ interface TaskCardProps {
 
 const TaskCard = ({ 
   task, 
-  dragHandleProps, 
   onTaskEdit, 
   onSubtaskUpdate,
   onSubtaskDelete,
@@ -137,7 +134,6 @@ const TaskCard = ({
         task={task}
         isEditing={isEditing}
         editedTask={editedTask}
-        dragHandleProps={dragHandleProps}
         onEditedTaskChange={setEditedTask}
         onSave={handleSave}
         onAddSubtask={handleAddSubtask}

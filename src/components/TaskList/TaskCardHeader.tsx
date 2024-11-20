@@ -42,7 +42,21 @@ const TaskCardHeader = ({
   return (
     <>
       <div className="flex flex-row items-center space-x-4 p-6">
-        <ScoreBadge score={task.priority_score || 0} max={10} size="lg" />
+        {isEditing ? (
+          <Input
+            type="number"
+            min="0"
+            max="10"
+            value={editedTask.priority_score || 0}
+            onChange={(e) => {
+              const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
+              onEditedTaskChange({ ...editedTask, priority_score: value });
+            }}
+            className="w-16 text-center"
+          />
+        ) : (
+          <ScoreBadge score={task.priority_score || 0} max={10} size="lg" />
+        )}
         <div className="flex-1">
           {isEditing ? (
             <div className="space-y-2">
@@ -63,7 +77,6 @@ const TaskCardHeader = ({
           )}
         </div>
         <div className="flex items-center space-x-2">
-          {/* Notes dropdown is now always visible, using editedTask when editing */}
           <NotesDropdown
             taskId={task.id}
             notes={isEditing ? editedTask.notes || [] : task.notes || []}
@@ -96,7 +109,7 @@ const TaskCardHeader = ({
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowDeleteDialog(true)}
-                  className="hover:bg-red-100 text-red-500"
+                  className="hover:bg-red-50 text-red-500"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
