@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 import { Slider } from "@/components/ui/slider";
 import ScoreBadge from "./Badges/ScoreBadge";
+import NotesDropdown from "./NotesDropdown";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -98,6 +99,11 @@ const TaskCardHeader = ({
           )}
         </div>
         <div className="flex items-center space-x-2">
+          <NotesDropdown
+            taskId={task.id}
+            notes={task.notes || []}
+            onNotesChange={(notes) => onEditedTaskChange({ ...editedTask, notes })}
+          />
           <Button
             variant="ghost"
             size="icon"

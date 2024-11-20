@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 import ScoreBadge from "./Badges/ScoreBadge";
 import { Slider } from "@/components/ui/slider";
+import NotesDropdown from "./NotesDropdown";
 
 interface SubtaskItemProps {
   subtask: Subtask;
@@ -92,6 +93,11 @@ const SubtaskItem = ({
         ) : (
           <ScoreBadge score={subtask.progress} max={100} variant="progress" size="sm" />
         )}
+        <NotesDropdown
+          subtaskId={subtask.id}
+          notes={subtask.notes || []}
+          onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
+        />
       </div>
       {isEditing && onDelete && (
         <Button

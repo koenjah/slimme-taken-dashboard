@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      notes: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: number
+          subtask_id: number | null
+          task_id: number | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: number
+          subtask_id?: number | null
+          task_id?: number | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: number
+          subtask_id?: number | null
+          task_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_subtask_id_fkey"
+            columns: ["subtask_id"]
+            isOneToOne: false
+            referencedRelation: "subtasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notes_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subtasks: {
         Row: {
           archived: boolean | null

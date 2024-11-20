@@ -10,6 +10,7 @@ export interface Task {
   created_at: string;
   archived: boolean;
   subtasks: Subtask[];
+  notes?: Note[];
 }
 
 export interface Subtask {
@@ -22,6 +23,15 @@ export interface Subtask {
   progress: number;
   due_date: string | null;
   archived: boolean;
+  created_at: string;
+  notes?: Note[];
+}
+
+export interface Note {
+  id: number;
+  task_id: number | null;
+  subtask_id: number | null;
+  content: string;
   created_at: string;
 }
 

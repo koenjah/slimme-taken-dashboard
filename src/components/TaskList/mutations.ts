@@ -6,29 +6,55 @@ export const fetchTasks = async (): Promise<Task[]> => {
     .from('tasks')
     .select('*')
     .eq('archived', false)
-    .order('priority_score', { ascending: true });  // Changed to ascending
+    .order('priority_score', { ascending: true });
 
   if (tasksError) throw tasksError;
 
-  const tasksWithSubtasks = await Promise.all(
+  const tasksWithSubtasksAndNotes = await Promise.all(
     (tasks || []).map(async (task) => {
       const { data: subtasks, error: subtasksError } = await supabase
         .from('subtasks')
         .select('*')
         .eq('task_id', task.id)
         .eq('archived', false)
-        .order('priority_score', { ascending: true });  // Changed to ascending
+        .order('priority_score', { ascending: true });
 
       if (subtasksError) throw subtasksError;
 
+      const { data: taskNotes, error: taskNotesError } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('task_id', task.id)
+        .order('created_at', { ascending: false });
+
+      if (taskNotesError) throw taskNotesError;
+
+      const subtasksWithNotes = await Promise.all(
+        (subtasks || []).map(async (subtask) => {
+          const { data: subtaskNotes, error: subtaskNotesError } = await supabase
+            .from('notes')
+            .select('*')
+            .eq('subtask_id', subtask.id)
+            .order('created_at', { ascending: false });
+
+          if (subtaskNotesError) throw subtaskNotesError;
+
+          return {
+            ...subtask,
+            notes: subtaskNotes || [],
+          };
+        })
+      );
+
       return {
         ...task,
-        subtasks: subtasks || [],
+        subtasks: subtasksWithNotes,
+        notes: taskNotes || [],
       };
     })
   );
 
-  return tasksWithSubtasks;
+  return tasksWithSubtasksAndNotes;
 };
 
 export const fetchArchivedTasks = async (): Promise<Task[]> => {
@@ -39,30 +65,56 @@ export const fetchArchivedTasks = async (): Promise<Task[]> => {
 
   if (tasksError) throw tasksError;
 
-  const tasksWithSubtasks = await Promise.all(
+  const tasksWithSubtasksAndNotes = await Promise.all(
     (allTasks || []).map(async (task) => {
       const { data: subtasks, error: subtasksError } = await supabase
         .from('subtasks')
         .select('*')
         .eq('task_id', task.id)
-        .order('priority_score', { ascending: true });  // Changed to ascending
+        .order('priority_score', { ascending: true });
 
       if (subtasksError) throw subtasksError;
 
+      const { data: taskNotes, error: taskNotesError } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('task_id', task.id)
+        .order('created_at', { ascending: false });
+
+      if (taskNotesError) throw taskNotesError;
+
+      const subtasksWithNotes = await Promise.all(
+        (subtasks || []).map(async (subtask) => {
+          const { data: subtaskNotes, error: subtaskNotesError } = await supabase
+            .from('notes')
+            .select('*')
+            .eq('subtask_id', subtask.id)
+            .order('created_at', { ascending: false });
+
+          if (subtaskNotesError) throw subtaskNotesError;
+
+          return {
+            ...subtask,
+            notes: subtaskNotes || [],
+          };
+        })
+      );
+
       return {
         ...task,
-        subtasks: subtasks || [],
+        subtasks: subtasksWithNotes,
+        notes: taskNotes || [],
       };
     })
   );
 
-  return tasksWithSubtasks.filter(task => 
+  return tasksWithSubtasksAndNotes.filter(task => 
     task.archived || (task.subtasks && task.subtasks.some(subtask => subtask.archived))
   );
 };
 
 export const updateTask = async (task: Partial<Task> & { id: number }): Promise<void> => {
-  const { subtasks, ...taskUpdate } = task;
+  const { subtasks, notes, ...taskUpdate } = task;
   
   const { error } = await supabase
     .from('tasks')
@@ -73,16 +125,18 @@ export const updateTask = async (task: Partial<Task> & { id: number }): Promise<
 };
 
 export const updateSubtask = async (subtask: Partial<Subtask> & { id: number }): Promise<void> => {
+  const { notes, ...subtaskUpdate } = subtask;
+  
   const { error } = await supabase
     .from('subtasks')
-    .update(subtask)
+    .update(subtaskUpdate)
     .eq('id', subtask.id);
   
   if (error) throw error;
 };
 
 export const createTask = async (taskData: Partial<Task>): Promise<Task> => {
-  const { subtasks, ...taskCreateData } = taskData;
+  const { subtasks, notes, ...taskCreateData } = taskData;
   
   const { data, error } = await supabase
     .from('tasks')
@@ -100,5 +154,5 @@ export const createTask = async (taskData: Partial<Task>): Promise<Task> => {
     .single();
 
   if (error) throw error;
-  return { ...data, subtasks: [] };
+  return { ...data, subtasks: [], notes: [] };
 };
