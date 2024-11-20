@@ -22,18 +22,26 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
+  // Update dropdown position when scrolling or opening
+  const updatePosition = () => {
     if (isOpen && buttonRef.current) {
       const buttonRect = buttonRef.current.getBoundingClientRect();
       const subtaskDiv = buttonRef.current.closest('.subtask-container');
       if (subtaskDiv) {
         const subtaskRect = subtaskDiv.getBoundingClientRect();
         setDropdownPosition({
-          top: subtaskRect.bottom + window.scrollY + 8,
+          top: subtaskRect.bottom + window.scrollY,
           left: subtaskRect.left + window.scrollX,
         });
       }
     }
+  };
+
+  useEffect(() => {
+    updatePosition();
+    // Update position on scroll
+    window.addEventListener('scroll', updatePosition, true);
+    return () => window.removeEventListener('scroll', updatePosition, true);
   }, [isOpen]);
 
   useEffect(() => {
@@ -161,18 +169,14 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       {isOpen && (
         <div 
           ref={dropdownRef}
-          className="fixed z-50 w-full max-w-[40rem] bg-white rounded-lg shadow-lg border border-gray-100 p-4"
+          className="absolute z-50 w-full max-w-[40rem] bg-white rounded-lg shadow-lg border border-gray-100 p-4"
           style={{ 
             top: `${dropdownPosition.top}px`,
             left: `${dropdownPosition.left}px`,
           }}
         >
           <div 
-            className="space-y-2 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400"
-            style={{
-              scrollbarWidth: 'thin',
-              scrollbarColor: '#D1D5DB transparent',
-            }}
+            className="space-y-2 max-h-[400px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400"
           >
             {notes.map((note) => (
               <NoteItem
