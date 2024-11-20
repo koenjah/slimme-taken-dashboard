@@ -52,22 +52,9 @@ const SubtaskItem = ({
           }}
           className="data-[state=checked]:bg-primary"
         />
-        {isEditing ? (
-          <Input
-            value={subtask.name}
-            onChange={(e) => {
-              onUpdate({
-                ...subtask,
-                name: e.target.value,
-              });
-            }}
-            className="flex-1"
-          />
-        ) : (
-          <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
-            {subtask.name}
-          </span>
-        )}
+        <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
+          {subtask.name}
+        </span>
         <div className="flex items-center space-x-4">
           {isEditing ? (
             <Slider
@@ -84,24 +71,26 @@ const SubtaskItem = ({
               className="w-24"
             />
           ) : (
-            <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
+            <>
+              <NotesDropdown
+                subtaskId={subtask.id}
+                notes={subtask.notes || []}
+                onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
+              />
+              <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
+            </>
           )}
-          <NotesDropdown
-            subtaskId={subtask.id}
-            notes={subtask.notes || []}
-            onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
-          />
+          {isEditing && onDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(subtask.id)}
+              className="hover:bg-red-50 hover:text-red-500 transition-all"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
-        {isEditing && onDelete && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(subtask.id)}
-            className="hover:bg-red-50 hover:text-red-500 transition-all"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        )}
       </div>
     </div>
   );
