@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import ScoreBadge from "./Badges/ScoreBadge";
 import NotesDropdown from "./NotesDropdown";
 
@@ -20,6 +22,39 @@ const SubtaskItem = ({
   onUpdate,
   onDelete,
 }: SubtaskItemProps) => {
+  const { toast } = useToast();
+
+  const handleAddNote = async () => {
+    try {
+      const { data: note, error } = await supabase
+        .from('notes')
+        .insert([{
+          subtask_id: subtask.id,
+          content: "",
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      onUpdate({
+        ...subtask,
+        notes: [...(subtask.notes || []), note],
+      });
+
+      toast({
+        title: "Notitie toegevoegd",
+        description: "Een nieuwe notitie is aangemaakt.",
+      });
+    } catch (error) {
+      toast({
+        title: "Fout bij toevoegen",
+        description: "Er is een fout opgetreden bij het aanmaken van de notitie.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="flex items-center space-x-3">
       {isEditing ? (
@@ -74,12 +109,7 @@ const SubtaskItem = ({
               variant="ghost"
               size="icon"
               className="h-8 w-8"
-              onClick={() => {
-                onUpdate({
-                  ...subtask,
-                  notes: [...(subtask.notes || []), { content: "", created_at: new Date().toISOString() }],
-                });
-              }}
+              onClick={handleAddNote}
             >
               <Plus className="h-4 w-4" />
             </Button>
