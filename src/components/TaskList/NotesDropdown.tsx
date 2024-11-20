@@ -1,12 +1,11 @@
-import { useState, useRef, useEffect } from "react";
-import { MessageSquare, X } from "lucide-react";
+import { useState } from "react";
+import { MessageSquare, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Note } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Separator } from "@/components/ui/separator";
-import NoteItem from "./Notes/NoteItem";
-import NewNoteForm from "./Notes/NewNoteForm";
 
 interface NotesDropdownProps {
   taskId?: number;
@@ -19,24 +18,7 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
   const [isOpen, setIsOpen] = useState(false);
   const [newNote, setNewNote] = useState("");
   const [editingNote, setEditingNote] = useState<Note | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
 
   const handleAddNote = async () => {
     if (!newNote.trim()) return;
@@ -119,7 +101,7 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
   if (!isOpen && notes.length === 0) return null;
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative">
       <Button
         variant="ghost"
         size="sm"
@@ -133,40 +115,79 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       </Button>
 
       {isOpen && (
-        <div className="absolute z-10 left-[-350px] mt-2 w-[400px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-semibold">Notities</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsOpen(false)}
-              className="h-6 w-6 p-0 hover:bg-gray-100 rounded-full"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="max-h-[400px] overflow-y-auto space-y-4">
+        <div className="absolute z-10 -left-[300px] mt-[-32px] w-[280px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4">
+          <div className="max-h-[300px] overflow-y-auto space-y-4">
             {notes.map((note) => (
               <div key={note.id} className="space-y-2">
-                <NoteItem
-                  note={note}
-                  editingNote={editingNote}
-                  onEdit={setEditingNote}
-                  onUpdate={handleUpdateNote}
-                  onDelete={handleDeleteNote}
-                  onCancelEdit={() => setEditingNote(null)}
-                />
+                {editingNote?.id === note.id ? (
+                  <div className="space-y-2">
+                    <Textarea
+                      value={editingNote.content}
+                      onChange={(e) => setEditingNote({ ...editingNote, content: e.target.value })}
+                      className="min-h-[60px] text-sm"
+                    />
+                    <div className="flex justify-end space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditingNote(null)}
+                      >
+                        Annuleren
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => handleUpdateNote(editingNote)}
+                      >
+                        Opslaan
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="group bg-gray-50 p-3 rounded-md">
+                    <div className="flex justify-between items-start">
+                      <p className="text-sm text-gray-700 flex-1">{note.content}</p>
+                      <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingNote(note)}
+                          className="h-6 w-6 p-0"
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteNote(note.id)}
+                          className="h-6 w-6 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <Separator className="my-2" />
               </div>
             ))}
           </div>
           
-          <NewNoteForm
-            value={newNote}
-            onChange={setNewNote}
-            onSubmit={handleAddNote}
-          />
+          <div className="space-y-2 pt-2 border-t border-gray-100">
+            <Textarea
+              value={newNote}
+              onChange={(e) => setNewNote(e.target.value)}
+              placeholder="Voeg een notitie toe..."
+              className="min-h-[80px] text-sm"
+            />
+            <Button
+              onClick={handleAddNote}
+              disabled={!newNote.trim()}
+              size="sm"
+              className="w-full"
+            >
+              Toevoegen
+            </Button>
+          </div>
         </div>
       )}
     </div>
