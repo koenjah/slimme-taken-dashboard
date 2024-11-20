@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 
 interface TaskListHeaderProps {
   onAddTask: () => void;
+  showArchiveButton: () => React.ReactNode;
 }
 
-// Header component for task list with add task button
-const TaskListHeader = ({ onAddTask }: TaskListHeaderProps) => {
+const TaskListHeader = ({ onAddTask, showArchiveButton }: TaskListHeaderProps) => {
   return (
-    <div className="flex justify-between items-center">
-      <h2 className="text-2xl font-semibold text-primary">Taken</h2>
+    <div className="flex justify-end items-center gap-2">
+      {showArchiveButton()}
       <Button
         onClick={onAddTask}
         variant="ghost"
