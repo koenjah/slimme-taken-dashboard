@@ -72,7 +72,7 @@ const SubtaskItem = ({
               }}
               className="flex-1"
             />
-            <div className="notes-dropdown">
+            <div className="notes-dropdown flex items-center">
               <NotesDropdown
                 subtaskId={subtask.id}
                 notes={subtask.notes || []}
