@@ -163,15 +163,14 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       {isOpen && (
         <div 
           ref={dropdownRef}
-          className="fixed z-50 w-full max-w-[40rem] bg-white rounded-lg shadow-lg border border-gray-100 p-4"
+          className="fixed z-50 w-full max-w-[500px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 overflow-y-auto overflow-x-hidden"
           style={{ 
             top: `${dropdownPosition.top}px`,
             left: `${dropdownPosition.left}px`,
             maxHeight: '60vh',
-            overflowY: 'auto',
           }}
         >
-          <div className="space-y-2 pr-2">
+          <div className="space-y-2">
             {notes.map((note) => (
               <NoteItem
                 key={note.id}

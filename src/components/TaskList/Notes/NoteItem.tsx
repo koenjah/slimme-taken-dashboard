@@ -63,7 +63,7 @@ const NoteItem = ({ note, onEdit, onDelete }: NoteItemProps) => {
         </div>
       ) : (
         <>
-          <div className="flex-1">
+          <div className="flex-1 max-h-[200px] overflow-y-auto pr-2">
             <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">
               {note.content}
             </p>
