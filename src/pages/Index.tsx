@@ -5,7 +5,7 @@ import ArchivedTaskList from "@/components/ArchivedTaskList";
 import WeeklyOverview from "@/components/TimeRegistration/WeeklyOverview";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Archive } from "lucide-react";
+import { Archive, ArrowLeft } from "lucide-react";
 
 const Index = () => {
   const [isTimeRegistrationOpen, setIsTimeRegistrationOpen] = useState(false);
@@ -16,7 +16,7 @@ const Index = () => {
       variant="ghost"
       size="icon"
       onClick={() => setShowArchive(!showArchive)}
-      className="text-gray-600 hover:text-gray-800"
+      className="text-gray-600 hover:text-gray-800 hover:bg-gray-100"
     >
       <Archive className="h-5 w-5" />
     </Button>
@@ -27,7 +27,19 @@ const Index = () => {
       <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid gap-8">
           {showArchive ? (
-            <ArchivedTaskList />
+            <div className="space-y-6">
+              <div className="flex justify-end">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowArchive(false)}
+                  className="text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+              </div>
+              <ArchivedTaskList />
+            </div>
           ) : (
             <>
               <TaskList showArchiveButton={archiveButton} />
