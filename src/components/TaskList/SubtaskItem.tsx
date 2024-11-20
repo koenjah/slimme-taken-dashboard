@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ScoreBadge from "./Badges/ScoreBadge";
 import NotesDropdown from "./NotesDropdown";
 
@@ -25,6 +25,11 @@ const SubtaskItem = ({
 }: SubtaskItemProps) => {
   const { toast } = useToast();
   const [localName, setLocalName] = useState(subtask.name);
+
+  // Synchroniseer localName wanneer subtask.name verandert
+  useEffect(() => {
+    setLocalName(subtask.name);
+  }, [subtask.name]);
 
   const handleAddNote = async () => {
     try {
