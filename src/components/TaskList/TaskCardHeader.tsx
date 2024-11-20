@@ -101,8 +101,12 @@ const TaskCardHeader = ({
         <div className="flex items-center space-x-2">
           <NotesDropdown
             taskId={task.id}
-            notes={task.notes || []}
-            onNotesChange={(notes) => onEditedTaskChange({ ...editedTask, notes })}
+            notes={isEditing ? editedTask.notes || [] : task.notes || []}
+            onNotesChange={(notes) => {
+              if (isEditing) {
+                onEditedTaskChange({ ...editedTask, notes });
+              }
+            }}
           />
           <Button
             variant="ghost"
