@@ -31,23 +31,28 @@ const ScoreBadge = ({ score, max, variant = "priority", className }: ScoreBadgeP
   };
 
   const getProgressColor = (progress: number) => {
-    return `rgba(${progress < 50 ? '156, 163, 175' : '107, 114, 128'}, 0.2)`;
+    return {
+      background: 'rgba(21, 66, 115, 0.1)', // Subtle bluish background
+      text: '#154273' // Primary blue for text
+    };
   };
 
   const isProgress = variant === "progress";
   const normalizedScore = isProgress ? score : (score / max) * 10;
-  const backgroundColor = isProgress ? getProgressColor(score) : `${getPriorityColor(normalizedScore)}20`;
-  const textColor = isProgress ? 'text-gray-600' : getPriorityColor(normalizedScore);
+  const colors = isProgress ? getProgressColor(score) : {
+    background: `${getPriorityColor(normalizedScore)}20`,
+    text: getPriorityColor(normalizedScore)
+  };
 
   return (
     <div
       className={cn(
-        "flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold",
+        "flex items-center justify-center w-13 h-13 rounded-full text-base font-bold",
         className
       )}
       style={{ 
-        backgroundColor,
-        color: textColor,
+        backgroundColor: colors.background,
+        color: colors.text,
       }}
     >
       {isProgress ? `${score}%` : score}
