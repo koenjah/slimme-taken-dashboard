@@ -132,7 +132,6 @@ const ArchivedTaskList = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold text-primary mb-6">Archief</h2>
       <div className="space-y-4">
         {tasksWithCompletedSubtasks?.map((task) => (
           <TaskCard
