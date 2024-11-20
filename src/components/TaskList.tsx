@@ -7,7 +7,11 @@ import TaskListHeader from "./TaskList/TaskListHeader";
 import { fetchTasks, updateTask, createTask, updateSubtask } from "./TaskList/mutations";
 import { supabase } from "@/integrations/supabase/client";
 
-const TaskList = () => {
+interface TaskListProps {
+  showArchiveButton: () => React.ReactNode;
+}
+
+const TaskList = ({ showArchiveButton }: TaskListProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -152,7 +156,7 @@ const TaskList = () => {
 
   return (
     <div className="space-y-6">
-      <TaskListHeader onAddTask={handleAddTask} />
+      <TaskListHeader onAddTask={handleAddTask} showArchiveButton={showArchiveButton} />
 
       <DragDropContext onDragEnd={handleTaskDragEnd}>
         <Droppable droppableId="tasks">

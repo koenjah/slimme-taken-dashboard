@@ -11,6 +11,17 @@ const Index = () => {
   const [isTimeRegistrationOpen, setIsTimeRegistrationOpen] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
 
+  const archiveButton = () => (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setShowArchive(!showArchive)}
+      className="text-gray-600 hover:text-gray-800"
+    >
+      <Archive className="h-5 w-5" />
+    </Button>
+  );
+
   return (
     <div className="min-h-screen bg-background py-8">
       <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,16 +30,7 @@ const Index = () => {
             <ArchivedTaskList />
           ) : (
             <>
-              <TaskList showArchiveButton={() => (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowArchive(!showArchive)}
-                  className="text-gray-600 hover:text-gray-800"
-                >
-                  <Archive className="h-5 w-5" />
-                </Button>
-              )} />
+              <TaskList showArchiveButton={archiveButton} />
               <WeeklyOverview />
             </>
           )}
