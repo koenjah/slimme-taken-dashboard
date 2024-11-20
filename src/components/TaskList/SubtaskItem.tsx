@@ -104,7 +104,7 @@ const SubtaskItem = ({
           </span>
         )}
         <div className="flex items-center space-x-4">
-          {isEditing && (
+          {isEditing && (!subtask.notes || subtask.notes.length === 0) && (
             <Button
               variant="ghost"
               size="icon"
