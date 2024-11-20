@@ -4,113 +4,19 @@ import { supabase } from "@/integrations/supabase/client";
 export const fetchTasks = async (): Promise<Task[]> => {
   const { data: tasks, error: tasksError } = await supabase
     .from('tasks')
-    .select('*')
+    .select(`
+      *,
+      subtasks (
+        *,
+        notes (*)
+      ),
+      notes (*)
+    `)
     .eq('archived', false)
     .order('priority_score', { ascending: true });
 
   if (tasksError) throw tasksError;
-
-  const tasksWithSubtasksAndNotes = await Promise.all(
-    (tasks || []).map(async (task) => {
-      const { data: subtasks, error: subtasksError } = await supabase
-        .from('subtasks')
-        .select('*')
-        .eq('task_id', task.id)
-        .eq('archived', false)
-        .order('priority_score', { ascending: true });
-
-      if (subtasksError) throw subtasksError;
-
-      const { data: taskNotes, error: taskNotesError } = await supabase
-        .from('notes')
-        .select('*')
-        .eq('task_id', task.id)
-        .order('created_at', { ascending: false });
-
-      if (taskNotesError) throw taskNotesError;
-
-      const subtasksWithNotes = await Promise.all(
-        (subtasks || []).map(async (subtask) => {
-          const { data: subtaskNotes, error: subtaskNotesError } = await supabase
-            .from('notes')
-            .select('*')
-            .eq('subtask_id', subtask.id)
-            .order('created_at', { ascending: false });
-
-          if (subtaskNotesError) throw subtaskNotesError;
-
-          return {
-            ...subtask,
-            notes: subtaskNotes || [],
-          };
-        })
-      );
-
-      return {
-        ...task,
-        subtasks: subtasksWithNotes,
-        notes: taskNotes || [],
-      };
-    })
-  );
-
-  return tasksWithSubtasksAndNotes;
-};
-
-export const fetchArchivedTasks = async (): Promise<Task[]> => {
-  const { data: allTasks, error: tasksError } = await supabase
-    .from('tasks')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (tasksError) throw tasksError;
-
-  const tasksWithSubtasksAndNotes = await Promise.all(
-    (allTasks || []).map(async (task) => {
-      const { data: subtasks, error: subtasksError } = await supabase
-        .from('subtasks')
-        .select('*')
-        .eq('task_id', task.id)
-        .order('priority_score', { ascending: true });
-
-      if (subtasksError) throw subtasksError;
-
-      const { data: taskNotes, error: taskNotesError } = await supabase
-        .from('notes')
-        .select('*')
-        .eq('task_id', task.id)
-        .order('created_at', { ascending: false });
-
-      if (taskNotesError) throw taskNotesError;
-
-      const subtasksWithNotes = await Promise.all(
-        (subtasks || []).map(async (subtask) => {
-          const { data: subtaskNotes, error: subtaskNotesError } = await supabase
-            .from('notes')
-            .select('*')
-            .eq('subtask_id', subtask.id)
-            .order('created_at', { ascending: false });
-
-          if (subtaskNotesError) throw subtaskNotesError;
-
-          return {
-            ...subtask,
-            notes: subtaskNotes || [],
-          };
-        })
-      );
-
-      return {
-        ...task,
-        subtasks: subtasksWithNotes,
-        notes: taskNotes || [],
-      };
-    })
-  );
-
-  return tasksWithSubtasksAndNotes.filter(task => 
-    task.archived || (task.subtasks && task.subtasks.some(subtask => subtask.archived))
-  );
+  return tasks || [];
 };
 
 export const updateTask = async (task: Partial<Task> & { id: number }): Promise<void> => {

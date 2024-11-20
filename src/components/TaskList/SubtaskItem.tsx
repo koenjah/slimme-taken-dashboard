@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import ScoreBadge from "./Badges/ScoreBadge";
 import NotesDropdown from "./NotesDropdown";
 
@@ -26,10 +26,18 @@ const SubtaskItem = ({
   const { toast } = useToast();
   const [localName, setLocalName] = useState(subtask.name);
 
-  // Synchroniseer localName wanneer subtask.name verandert
   useEffect(() => {
     setLocalName(subtask.name);
   }, [subtask.name]);
+
+  const handleNameUpdate = useCallback((newName: string) => {
+    if (newName !== subtask.name) {
+      onUpdate({
+        ...subtask,
+        name: newName,
+      });
+    }
+  }, [subtask, onUpdate]);
 
   const handleAddNote = async () => {
     try {
@@ -98,14 +106,7 @@ const SubtaskItem = ({
           <Input
             value={localName}
             onChange={(e) => setLocalName(e.target.value)}
-            onBlur={() => {
-              if (localName !== subtask.name) {
-                onUpdate({
-                  ...subtask,
-                  name: localName,
-                });
-              }
-            }}
+            onBlur={() => handleNameUpdate(localName)}
             className="flex-1 min-w-[300px]"
           />
         ) : (
