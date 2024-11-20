@@ -1,5 +1,5 @@
 import { Subtask } from "@/types";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -129,7 +129,12 @@ const SubtaskItem = ({
               className="w-24"
             />
           ) : (
-            <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
+            <div className="flex items-center space-x-2">
+              {(subtask.notes?.length || 0) > 0 && (
+                <MessageCircle className="h-4 w-4 text-gray-400" />
+              )}
+              <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
+            </div>
           )}
           <NotesDropdown
             subtaskId={subtask.id}
