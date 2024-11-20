@@ -64,11 +64,10 @@ const SubtaskList = ({
                         if (!isEditing) {
                           onSubtaskUpdate(updatedSubtask);
                         } else {
-                          onSubtasksChange(
-                            editedSubtasks.map(s => 
-                              s.id === updatedSubtask.id ? updatedSubtask : s
-                            )
+                          const newSubtasks = editedSubtasks.map(s => 
+                            s.id === updatedSubtask.id ? { ...s, ...updatedSubtask } : s
                           );
+                          onSubtasksChange(newSubtasks);
                         }
                       }}
                       onDelete={onSubtaskDelete}

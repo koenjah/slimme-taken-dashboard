@@ -89,7 +89,7 @@ const TaskCard = ({
           progress: 0,
           completed: false,
         }])
-        .select('*')
+        .select()
         .single();
 
       if (error) throw error;
