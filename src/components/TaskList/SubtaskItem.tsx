@@ -18,7 +18,7 @@ const SubtaskItem = ({
   onUpdate,
   onDelete,
 }: SubtaskItemProps) => {
-  // Local state for editing, only updates parent on save
+  // Local state for editing
   const [localName, setLocalName] = useState(subtask.name);
 
   // Sync local state when subtask prop changes
@@ -33,6 +33,14 @@ const SubtaskItem = ({
         name: localName,
       });
     }
+  };
+
+  const handleProgressUpdate = (progress: number) => {
+    onUpdate({
+      ...subtask,
+      progress,
+      completed: progress === 100,
+    });
   };
 
   return (
@@ -62,15 +70,23 @@ const SubtaskItem = ({
           </span>
         )}
         <div className="flex items-center justify-end min-w-[100px]">
-          <span className="text-sm font-medium text-gray-600 mr-2">
-            {subtask.progress}%
-          </span>
+          <Input
+            type="number"
+            value={subtask.progress}
+            onChange={(e) => {
+              const progress = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+              handleProgressUpdate(progress);
+            }}
+            className="w-20 text-right"
+            min="0"
+            max="100"
+          />
           {isEditing && onDelete && (
             <Button
               variant="ghost"
               size="icon"
               onClick={() => onDelete(subtask.id)}
-              className="hover:bg-red-50 hover:text-red-500 transition-all"
+              className="hover:bg-red-50 hover:text-red-500 transition-all ml-2"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
