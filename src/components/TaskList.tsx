@@ -11,12 +11,10 @@ const TaskList = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Query en mutation hooks
+  // Query and mutation hooks
   const { data: tasks, isLoading } = useQuery({
     queryKey: ['tasks'],
     queryFn: fetchTasks,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
   });
 
   const updateTaskMutation = useMutation({
@@ -26,6 +24,18 @@ const TaskList = () => {
       queryClient.invalidateQueries({ queryKey: ['archivedTasks'] });
       toast({
         title: "Taak bijgewerkt",
+        description: "De wijzigingen zijn succesvol opgeslagen.",
+      });
+    },
+  });
+
+  const updateSubtaskMutation = useMutation({
+    mutationFn: updateSubtask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['archivedTasks'] });
+      toast({
+        title: "Subtaak bijgewerkt",
         description: "De wijzigingen zijn succesvol opgeslagen.",
       });
     },
@@ -76,20 +86,26 @@ const TaskList = () => {
     },
   });
 
-  const updateSubtaskMutation = useMutation({
-    mutationFn: updateSubtask,
+  const deleteSubtaskMutation = useMutation({
+    mutationFn: async (subtaskId: number) => {
+      const { error } = await supabase
+        .from('subtasks')
+        .delete()
+        .eq('id', subtaskId);
+
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
-        title: "Subtaak bijgewerkt",
-        description: "De wijzigingen zijn succesvol opgeslagen.",
+        title: "Subtaak verwijderd",
+        description: "De subtaak is succesvol verwijderd.",
       });
     },
-    onError: (error) => {
-      console.error('Error updating subtask:', error);
+    onError: () => {
       toast({
-        title: "Fout bij bijwerken",
-        description: "Er is een fout opgetreden bij het bijwerken van de subtaak.",
+        title: "Fout bij verwijderen",
+        description: "Er is een fout opgetreden bij het verwijderen van de subtaak.",
         variant: "destructive",
       });
     },
