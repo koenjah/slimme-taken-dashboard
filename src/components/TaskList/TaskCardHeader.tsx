@@ -28,6 +28,33 @@ interface TaskCardHeaderProps {
   showEditButton?: boolean;
 }
 
+const getPriorityColor = (score: number) => {
+  // Create a gradient from green (0) to red (10)
+  const colors = {
+    0: "#4ade80", // Light green
+    2.5: "#86efac", // Lighter green
+    5: "#fde047", // Yellow
+    7.5: "#fb923c", // Orange
+    10: "#f87171", // Red
+  };
+
+  // Find the two closest colors and interpolate
+  const colorPoints = Object.entries(colors).map(([score, color]) => ({
+    score: parseFloat(score),
+    color,
+  }));
+
+  const lowerColor = colorPoints.reduce((prev, curr) => {
+    return curr.score <= score && curr.score > prev.score ? curr : prev;
+  }, colorPoints[0]);
+
+  const upperColor = colorPoints.reduce((prev, curr) => {
+    return curr.score >= score && curr.score < prev.score ? curr : prev;
+  }, colorPoints[colorPoints.length - 1]);
+
+  return lowerColor.color;
+};
+
 const TaskCardHeader = ({
   task,
   isEditing,
@@ -49,15 +76,42 @@ const TaskCardHeader = ({
         </div>
         <div className="flex-1">
           {isEditing ? (
-            <Input
-              value={editedTask.name}
-              onChange={(e) => onEditedTaskChange({ ...editedTask, name: e.target.value })}
-              className="font-title text-lg text-[#154273]"
-            />
+            <div className="space-y-2">
+              <Input
+                value={editedTask.name}
+                onChange={(e) => onEditedTaskChange({ ...editedTask, name: e.target.value })}
+                className="font-title text-lg text-[#154273]"
+              />
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-500">Prioriteit:</span>
+                <Input
+                  type="number"
+                  min="0"
+                  max="10"
+                  value={editedTask.priority_score || 0}
+                  onChange={(e) => {
+                    const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
+                    onEditedTaskChange({ ...editedTask, priority_score: value });
+                  }}
+                  className="w-20"
+                />
+              </div>
+            </div>
           ) : (
-            <h3 className="text-lg font-title text-[#154273]">
-              {task.name}
-            </h3>
+            <div className="space-y-1">
+              <h3 className="text-lg font-title text-[#154273]">
+                {task.name}
+              </h3>
+              <div 
+                className="text-sm px-2 py-0.5 rounded-full w-fit"
+                style={{ 
+                  backgroundColor: `${getPriorityColor(task.priority_score || 0)}20`,
+                  color: getPriorityColor(task.priority_score || 0),
+                }}
+              >
+                Prioriteit: {task.priority_score || 0}
+              </div>
+            </div>
           )}
         </div>
         {isEditing ? (

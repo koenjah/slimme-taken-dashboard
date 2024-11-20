@@ -15,6 +15,33 @@ interface SubtaskListProps {
   onSubtaskDelete?: (subtaskId: number) => void;
 }
 
+const getPriorityColor = (score: number) => {
+  // Create a gradient from green (0) to red (10)
+  const colors = {
+    0: "#4ade80", // Light green
+    2.5: "#86efac", // Lighter green
+    5: "#fde047", // Yellow
+    7.5: "#fb923c", // Orange
+    10: "#f87171", // Red
+  };
+
+  // Find the two closest colors and interpolate
+  const colorPoints = Object.entries(colors).map(([score, color]) => ({
+    score: parseFloat(score),
+    color,
+  }));
+
+  const lowerColor = colorPoints.reduce((prev, curr) => {
+    return curr.score <= score && curr.score > prev.score ? curr : prev;
+  }, colorPoints[0]);
+
+  const upperColor = colorPoints.reduce((prev, curr) => {
+    return curr.score >= score && curr.score < prev.score ? curr : prev;
+  }, colorPoints[colorPoints.length - 1]);
+
+  return lowerColor.color;
+};
+
 const SubtaskList = ({
   taskId,
   isEditing,
@@ -43,7 +70,7 @@ const SubtaskList = ({
       ...subtask,
       completed: checked,
       progress: checked ? 100 : 0,
-      archived: checked, // Set archived to true when completed
+      archived: checked,
     };
 
     if (!isEditing) {
@@ -93,23 +120,55 @@ const SubtaskList = ({
                       tabIndex={-1}
                       aria-hidden={!isEditing}
                     />
-                    {isEditing ? (
-                      <Input
-                        value={subtask.name}
-                        onChange={(e) => {
-                          onSubtasksChange(
-                            editedSubtasks.map(s =>
-                              s.id === subtask.id ? { ...s, name: e.target.value } : s
-                            )
-                          );
-                        }}
-                        className="flex-1"
-                      />
-                    ) : (
-                      <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
-                        {subtask.name}
-                      </span>
-                    )}
+                    <div className="flex-1 space-y-1">
+                      {isEditing ? (
+                        <div className="space-y-2">
+                          <Input
+                            value={subtask.name}
+                            onChange={(e) => {
+                              onSubtasksChange(
+                                editedSubtasks.map(s =>
+                                  s.id === subtask.id ? { ...s, name: e.target.value } : s
+                                )
+                              );
+                            }}
+                          />
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-500">Prioriteit:</span>
+                            <Input
+                              type="number"
+                              min="0"
+                              max="10"
+                              value={subtask.priority_score || 0}
+                              onChange={(e) => {
+                                const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
+                                onSubtasksChange(
+                                  editedSubtasks.map(s =>
+                                    s.id === subtask.id ? { ...s, priority_score: value } : s
+                                  )
+                                );
+                              }}
+                              className="w-20"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          <span className={`text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
+                            {subtask.name}
+                          </span>
+                          <div 
+                            className="text-sm px-2 py-0.5 rounded-full w-fit"
+                            style={{ 
+                              backgroundColor: `${getPriorityColor(subtask.priority_score || 0)}20`,
+                              color: getPriorityColor(subtask.priority_score || 0),
+                            }}
+                          >
+                            Prioriteit: {subtask.priority_score || 0}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     {isEditing ? (
                       <div className="flex items-center space-x-4 min-w-[200px]">
                         <Slider
