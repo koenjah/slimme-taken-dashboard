@@ -1,11 +1,9 @@
 import { Subtask } from "@/types";
-import { Trash2, Plus, MessageCircle } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import ScoreBadge from "./Badges/ScoreBadge";
 import NotesDropdown from "./NotesDropdown";
 
@@ -14,6 +12,7 @@ interface SubtaskItemProps {
   isEditing: boolean;
   onUpdate: (subtask: Subtask) => void;
   onDelete?: (subtaskId: number) => void;
+  dragHandleProps?: any;
 }
 
 const SubtaskItem = ({
@@ -21,42 +20,16 @@ const SubtaskItem = ({
   isEditing,
   onUpdate,
   onDelete,
+  dragHandleProps,
 }: SubtaskItemProps) => {
-  const { toast } = useToast();
-
-  const handleAddNote = async () => {
-    try {
-      const { data: note, error } = await supabase
-        .from('notes')
-        .insert([{
-          subtask_id: subtask.id,
-          content: "",
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      onUpdate({
-        ...subtask,
-        notes: [...(subtask.notes || []), note],
-      });
-
-      toast({
-        title: "Notitie toegevoegd",
-        description: "Een nieuwe notitie is aangemaakt.",
-      });
-    } catch (error) {
-      toast({
-        title: "Fout bij toevoegen",
-        description: "Er is een fout opgetreden bij het aanmaken van de notitie.",
-        variant: "destructive",
-      });
+  const handleClick = (e: React.MouseEvent) => {
+    if (!(e.target as HTMLElement).closest('.notes-dropdown')) {
+      // Your existing click handling logic
     }
   };
 
   return (
-    <div className="flex items-center space-x-3">
+    <div className="flex items-center space-x-3" onClick={handleClick}>
       {isEditing ? (
         <Input
           type="number"
@@ -75,7 +48,7 @@ const SubtaskItem = ({
       ) : (
         <ScoreBadge score={subtask.priority_score || 0} max={10} size="sm" />
       )}
-      <div className="flex-1 flex items-center space-x-3 p-2 bg-white/80 rounded-md shadow-sm border border-gray-100">
+      <div className="subtask-container flex-1 flex items-center space-x-3 p-2 bg-white/80 rounded-md shadow-sm border border-gray-100">
         <Checkbox
           checked={subtask.completed}
           onCheckedChange={(checked) => {
@@ -104,23 +77,12 @@ const SubtaskItem = ({
           </span>
         )}
         <div className="flex items-center space-x-4">
-          {isEditing && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={handleAddNote}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          )}
-          <div className="flex items-center space-x-2">
+          <div className="notes-dropdown">
             <NotesDropdown
               subtaskId={subtask.id}
               notes={subtask.notes || []}
               onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
             />
-            <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
           </div>
           {isEditing ? (
             <Slider
@@ -136,18 +98,20 @@ const SubtaskItem = ({
               step={1}
               className="w-24"
             />
-          ) : null}
-          {isEditing && onDelete && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDelete(subtask.id)}
-              className="hover:bg-red-50 hover:text-red-500 transition-all"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+          ) : (
+            <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
           )}
         </div>
+        {isEditing && onDelete && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDelete(subtask.id)}
+            className="hover:bg-red-50 hover:text-red-500 transition-all"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </div>
   );

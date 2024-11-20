@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageSquare, X } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Note } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Separator } from "@/components/ui/separator";
 import NoteItem from "./Notes/NoteItem";
 import NewNoteForm from "./Notes/NewNoteForm";
 
@@ -18,13 +17,19 @@ interface NotesDropdownProps {
 const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [newNote, setNewNote] = useState("");
-  const [editingNote, setEditingNote] = useState<Note | null>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
+  // Handle clicks outside dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -69,25 +74,26 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
     }
   };
 
-  const handleUpdateNote = async (note: Note) => {
+  const handleEditNote = async (noteId: number, content: string) => {
     try {
       const { error } = await supabase
         .from('notes')
-        .update({ content: note.content })
-        .eq('id', note.id);
+        .update({ content: content.trim() })
+        .eq('id', noteId);
 
       if (error) throw error;
 
-      onNotesChange(notes.map(n => n.id === note.id ? note : n));
-      setEditingNote(null);
+      onNotesChange(notes.map(note => 
+        note.id === noteId ? { ...note, content: content.trim() } : note
+      ));
       toast({
         title: "Notitie bijgewerkt",
-        description: "De wijzigingen zijn succesvol opgeslagen.",
+        description: "De notitie is succesvol bijgewerkt.",
       });
     } catch (error) {
       toast({
-        title: "Fout bij bijwerken",
-        description: "Er is een fout opgetreden bij het bijwerken van de notitie.",
+        title: "Fout bij bewerken",
+        description: "Er is een fout opgetreden bij het bewerken van de notitie.",
         variant: "destructive",
       });
     }
@@ -116,17 +122,20 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
     }
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsOpen(!isOpen);
+  };
+
   if (!isOpen && notes.length === 0) return null;
 
   return (
-    <div className="relative notes-dropdown" ref={dropdownRef}>
+    <div className="relative">
       <Button
+        ref={buttonRef}
         variant="ghost"
         size="sm"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsOpen(!isOpen);
-        }}
+        onClick={handleClick}
         className={`text-gray-500 hover:text-primary ${isOpen ? 'text-primary' : ''}`}
       >
         <MessageSquare className="h-4 w-4" />
@@ -136,42 +145,30 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       </Button>
 
       {isOpen && (
-        <div className="absolute z-10 left-[-450px] mt-2 w-[500px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-semibold">Notities</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpen(false);
-              }}
-              className="h-6 w-6 p-0 hover:bg-gray-100 rounded-full"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="max-h-[400px] overflow-y-auto space-y-4">
+        <div 
+          ref={dropdownRef}
+          className="absolute right-0 z-50 w-[500px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 overflow-y-auto overflow-x-hidden"
+          style={{ 
+            maxHeight: '60vh',
+            top: '100%',
+            marginTop: '0.5rem'
+          }}
+        >
+          <div className="space-y-2">
             {notes.map((note) => (
-              <div key={note.id} className="space-y-2">
-                <NoteItem
-                  note={note}
-                  editingNote={editingNote}
-                  onEdit={setEditingNote}
-                  onUpdate={handleUpdateNote}
-                  onDelete={handleDeleteNote}
-                  onCancelEdit={() => setEditingNote(null)}
-                />
-                <Separator className="my-2" />
-              </div>
+              <NoteItem
+                key={note.id}
+                note={note}
+                onEdit={handleEditNote}
+                onDelete={handleDeleteNote}
+              />
             ))}
           </div>
           
           <NewNoteForm
-            value={newNote}
-            onChange={setNewNote}
-            onSubmit={handleAddNote}
+            newNote={newNote}
+            onNewNoteChange={setNewNote}
+            onAddNote={handleAddNote}
           />
         </div>
       )}

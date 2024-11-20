@@ -1,74 +1,99 @@
+import React, { useState } from "react";
 import { Note } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Pencil, Trash2 } from "lucide-react";
+import { Check, X, Pencil, Trash2 } from "lucide-react";
 
 interface NoteItemProps {
   note: Note;
-  editingNote: Note | null;
-  onEdit: (note: Note) => void;
-  onUpdate: (note: Note) => void;
+  onEdit: (noteId: number, content: string) => void;
   onDelete: (noteId: number) => void;
-  onCancelEdit: () => void;
 }
 
-const NoteItem = ({ 
-  note, 
-  editingNote, 
-  onEdit, 
-  onUpdate, 
-  onDelete, 
-  onCancelEdit 
-}: NoteItemProps) => {
-  if (editingNote?.id === note.id) {
-    return (
-      <div className="space-y-2">
-        <Textarea
-          value={editingNote.content}
-          onChange={(e) => onEdit({ ...editingNote, content: e.target.value })}
-          className="min-h-[60px] text-sm w-full resize-none"
-          style={{ maxHeight: '200px', overflowY: 'auto', overflowX: 'hidden', wordWrap: 'break-word' }}
-        />
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" size="sm" onClick={onCancelEdit}>
-            Annuleren
-          </Button>
-          <Button size="sm" onClick={() => onUpdate(editingNote)}>
-            Opslaan
-          </Button>
-        </div>
-      </div>
-    );
-  }
+const NoteItem = ({ note, onEdit, onDelete }: NoteItemProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState(note.content);
+
+  const handleSave = () => {
+    onEdit(note.id, editedContent);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditedContent(note.content);
+    setIsEditing(false);
+  };
 
   return (
-    <div className="group bg-gray-50 p-3 rounded-md">
-      <div className="flex justify-between items-start">
-        <p 
-          className="text-sm text-gray-700 flex-1 whitespace-pre-wrap break-words" 
-          style={{ maxHeight: '200px', overflowY: 'auto' }}
-        >
-          {note.content}
-        </p>
-        <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onEdit(note)}
-            className="h-6 w-6 p-0"
-          >
-            <Pencil className="h-3 w-3" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDelete(note.id)}
-            className="h-6 w-6 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
+    <div className="group relative flex flex-col space-y-2 p-2 rounded-md hover:bg-gray-50">
+      {isEditing ? (
+        <div className="flex-1 space-y-2">
+          <Textarea
+            value={editedContent}
+            onChange={(e) => setEditedContent(e.target.value)}
+            className="min-h-[60px] text-sm resize-none"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="flex space-x-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSave();
+              }}
+              className="text-green-600 hover:text-green-700"
+            >
+              <Check className="h-4 w-4 mr-1" />
+              Opslaan
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCancel();
+              }}
+              className="text-gray-600 hover:text-gray-700"
+            >
+              <X className="h-4 w-4 mr-1" />
+              Annuleren
+            </Button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <>
+          <div className="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-md p-1 z-10">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsEditing(true);
+              }}
+              className="text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(note.id);
+              }}
+              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex-1 max-h-[200px] overflow-y-auto">
+            <p className="text-sm text-gray-700 whitespace-pre-wrap break-words pr-2">
+              {note.content}
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 };
