@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 import { Slider } from "@/components/ui/slider";
+import ScoreBadge from "./Badges/ScoreBadge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,33 +28,6 @@ interface TaskCardHeaderProps {
   onDelete?: () => void;
   showEditButton?: boolean;
 }
-
-const getPriorityColor = (score: number) => {
-  // Create a gradient from green (0) to red (10)
-  const colors = {
-    0: "#4ade80", // Light green
-    2.5: "#86efac", // Lighter green
-    5: "#fde047", // Yellow
-    7.5: "#fb923c", // Orange
-    10: "#f87171", // Red
-  };
-
-  // Find the two closest colors and interpolate
-  const colorPoints = Object.entries(colors).map(([score, color]) => ({
-    score: parseFloat(score),
-    color,
-  }));
-
-  const lowerColor = colorPoints.reduce((prev, curr) => {
-    return curr.score <= score && curr.score > prev.score ? curr : prev;
-  }, colorPoints[0]);
-
-  const upperColor = colorPoints.reduce((prev, curr) => {
-    return curr.score >= score && curr.score < prev.score ? curr : prev;
-  }, colorPoints[colorPoints.length - 1]);
-
-  return lowerColor.color;
-};
 
 const TaskCardHeader = ({
   task,
@@ -99,17 +73,12 @@ const TaskCardHeader = ({
             </div>
           ) : (
             <div className="space-y-1">
-              <h3 className="text-lg font-title text-[#154273]">
-                {task.name}
-              </h3>
-              <div 
-                className="text-sm px-2 py-0.5 rounded-full w-fit"
-                style={{ 
-                  backgroundColor: `${getPriorityColor(task.priority_score || 0)}20`,
-                  color: getPriorityColor(task.priority_score || 0),
-                }}
-              >
-                Prioriteit: {task.priority_score || 0}
+              <div className="flex items-center space-x-3">
+                <ScoreBadge score={task.priority_score || 0} max={10} />
+                <ScoreBadge score={task.progress} max={100} variant="progress" />
+                <h3 className="text-lg font-title text-[#154273]">
+                  {task.name}
+                </h3>
               </div>
             </div>
           )}
