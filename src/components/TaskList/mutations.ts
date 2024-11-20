@@ -6,7 +6,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
     .from('tasks')
     .select('*')
     .eq('archived', false)
-    .order('priority_score', { ascending: false });
+    .order('priority_score', { ascending: true });  // Changed to ascending
 
   if (tasksError) throw tasksError;
 
@@ -17,7 +17,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
         .select('*')
         .eq('task_id', task.id)
         .eq('archived', false)
-        .order('priority_score', { ascending: false });
+        .order('priority_score', { ascending: true });  // Changed to ascending
 
       if (subtasksError) throw subtasksError;
 
@@ -32,7 +32,6 @@ export const fetchTasks = async (): Promise<Task[]> => {
 };
 
 export const fetchArchivedTasks = async (): Promise<Task[]> => {
-  // First, fetch all tasks
   const { data: allTasks, error: tasksError } = await supabase
     .from('tasks')
     .select('*')
@@ -42,12 +41,11 @@ export const fetchArchivedTasks = async (): Promise<Task[]> => {
 
   const tasksWithSubtasks = await Promise.all(
     (allTasks || []).map(async (task) => {
-      // For each task, fetch both archived and non-archived subtasks
       const { data: subtasks, error: subtasksError } = await supabase
         .from('subtasks')
         .select('*')
         .eq('task_id', task.id)
-        .order('created_at', { ascending: false });
+        .order('priority_score', { ascending: true });  // Changed to ascending
 
       if (subtasksError) throw subtasksError;
 
@@ -58,7 +56,6 @@ export const fetchArchivedTasks = async (): Promise<Task[]> => {
     })
   );
 
-  // Return tasks that are either archived themselves or have archived subtasks
   return tasksWithSubtasks.filter(task => 
     task.archived || (task.subtasks && task.subtasks.some(subtask => subtask.archived))
   );
