@@ -1,5 +1,5 @@
 import { Subtask } from "@/types";
-import { Trash2, Plus, MessageCircle } from "lucide-react";
+import { Trash2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -111,7 +111,7 @@ const SubtaskItem = ({
               className="h-8 w-8"
               onClick={handleAddNote}
             >
-              <Plus className="h-4 w-4" />
+              <MessageSquare className="h-4 w-4" />
             </Button>
           )}
           <div className="flex items-center space-x-2">
