@@ -119,14 +119,11 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
   if (!isOpen && notes.length === 0) return null;
 
   return (
-    <div className="relative notes-dropdown" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef}>
       <Button
         variant="ghost"
         size="sm"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsOpen(!isOpen);
-        }}
+        onClick={() => setIsOpen(!isOpen)}
         className={`text-gray-500 hover:text-primary ${isOpen ? 'text-primary' : ''}`}
       >
         <MessageSquare className="h-4 w-4" />
@@ -136,16 +133,13 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       </Button>
 
       {isOpen && (
-        <div className="absolute z-10 left-[-450px] mt-2 w-[500px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4">
+        <div className="absolute z-10 left-[-350px] mt-2 w-[400px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-semibold">Notities</span>
             <Button
               variant="ghost"
               size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpen(false);
-              }}
+              onClick={() => setIsOpen(false)}
               className="h-6 w-6 p-0 hover:bg-gray-100 rounded-full"
             >
               <X className="h-4 w-4" />

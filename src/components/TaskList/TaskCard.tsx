@@ -31,6 +31,7 @@ const TaskCard = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
+  // Update editedSubtasks when task.subtasks changes
   useEffect(() => {
     setEditedSubtasks(
       [...(task.subtasks || [])].sort((a, b) => (a.priority_score || 0) - (b.priority_score || 0))
@@ -54,12 +55,14 @@ const TaskCard = ({
   }, [isEditing, editedTask, editedSubtasks, deletedSubtaskIds]);
 
   const handleSave = async () => {
-    if (deletedSubtaskIds.length > 0 && onSubtaskDelete) {
+    // First delete any subtasks marked for deletion
+    if (onSubtaskDelete) {
       for (const subtaskId of deletedSubtaskIds) {
         await onSubtaskDelete(subtaskId);
       }
     }
 
+    // Then update the task and remaining subtasks
     onTaskEdit(editedTask);
     editedSubtasks.forEach(subtask => {
       if (JSON.stringify(subtask) !== JSON.stringify(task.subtasks?.find(s => s.id === subtask.id))) {
@@ -114,12 +117,10 @@ const TaskCard = ({
     setDeletedSubtaskIds(prev => [...prev, subtaskId]);
   };
 
-  const handleSubtaskClick = (e: React.MouseEvent) => {
-    // Check if the click is coming from the notes icon or dropdown
-    if (!(e.target as HTMLElement).closest('.notes-dropdown')) {
-      if (!isEditing) {
-        setIsEditing(true);
-      }
+  // Enter edit mode when clicking any subtask
+  const handleSubtaskClick = () => {
+    if (!isEditing) {
+      setIsEditing(true);
     }
   };
 
