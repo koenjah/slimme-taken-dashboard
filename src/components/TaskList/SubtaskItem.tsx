@@ -51,6 +51,7 @@ const SubtaskItem = ({
             }}
             className="flex-1"
           />
+          {/* Always show NotesDropdown in edit mode */}
           <NotesDropdown
             subtaskId={subtask.id}
             notes={subtask.notes || []}
@@ -86,6 +87,7 @@ const SubtaskItem = ({
             {subtask.name}
           </span>
           <div className="flex items-center gap-3">
+            {/* Only show NotesDropdown in non-edit mode if there are notes */}
             {(subtask.notes?.length ?? 0) > 0 && (
               <NotesDropdown
                 subtaskId={subtask.id}
