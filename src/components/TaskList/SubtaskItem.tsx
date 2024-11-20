@@ -2,8 +2,10 @@ import { Subtask } from "@/types";
 import { GripVertical, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 import ScoreBadge from "./Badges/ScoreBadge";
+import { Slider } from "@/components/ui/slider";
 
 interface SubtaskItemProps {
   subtask: Subtask;
@@ -41,16 +43,49 @@ const SubtaskItem = ({
       <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
         {subtask.name}
       </span>
-      <div className="flex items-center space-x-2">
-        <ScoreBadge score={subtask.priority_score || 0} max={10} size="sm" />
-        <ScoreBadge score={subtask.progress} max={100} variant="progress" size="sm" />
+      <div className="flex items-center space-x-4">
+        {isEditing ? (
+          <Input
+            type="number"
+            min="0"
+            max="10"
+            value={subtask.priority_score || 0}
+            onChange={(e) => {
+              const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
+              onUpdate({
+                ...subtask,
+                priority_score: value,
+              });
+            }}
+            className="w-16 text-center"
+          />
+        ) : (
+          <ScoreBadge score={subtask.priority_score || 0} max={10} size="sm" />
+        )}
+        {isEditing ? (
+          <Slider
+            value={[subtask.progress]}
+            onValueChange={(value) => {
+              onUpdate({
+                ...subtask,
+                progress: value[0],
+                completed: value[0] === 100,
+              });
+            }}
+            max={100}
+            step={1}
+            className="w-24"
+          />
+        ) : (
+          <ScoreBadge score={subtask.progress} max={100} variant="progress" size="sm" />
+        )}
       </div>
       {isEditing && onDelete && (
         <Button
           variant="ghost"
           size="icon"
           onClick={() => onDelete(subtask.id)}
-          className="opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 transition-all"
+          className="hover:bg-red-50 hover:text-red-500 transition-all"
         >
           <Trash2 className="h-4 w-4" />
         </Button>

@@ -56,19 +56,6 @@ const TaskCardHeader = ({
                 onChange={(e) => onEditedTaskChange({ ...editedTask, name: e.target.value })}
                 className="font-title text-lg text-[#154273]"
               />
-              <div className="flex items-center space-x-2">
-                <Input
-                  type="number"
-                  min="0"
-                  max="10"
-                  value={editedTask.priority_score || 0}
-                  onChange={(e) => {
-                    const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
-                    onEditedTaskChange({ ...editedTask, priority_score: value });
-                  }}
-                  className="w-20"
-                />
-              </div>
             </div>
           ) : (
             <div className="space-y-1">
@@ -80,8 +67,23 @@ const TaskCardHeader = ({
             </div>
           )}
         </div>
-        {isEditing ? (
-          <div className="flex items-center space-x-4 min-w-[200px]">
+        <div className="flex items-center space-x-4">
+          {isEditing ? (
+            <Input
+              type="number"
+              min="0"
+              max="10"
+              value={editedTask.priority_score || 0}
+              onChange={(e) => {
+                const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
+                onEditedTaskChange({ ...editedTask, priority_score: value });
+              }}
+              className="w-20 text-center"
+            />
+          ) : (
+            <ScoreBadge score={task.priority_score || 0} max={10} size="lg" />
+          )}
+          {isEditing ? (
             <Slider
               value={[editedTask.progress]}
               onValueChange={(value) => {
@@ -89,19 +91,12 @@ const TaskCardHeader = ({
               }}
               max={100}
               step={1}
-              className="flex-1"
+              className="w-32"
             />
-            <div className="flex items-center space-x-2">
-              <ScoreBadge score={editedTask.priority_score || 0} max={10} size="lg" />
-              <ScoreBadge score={editedTask.progress} max={100} variant="progress" size="lg" />
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center space-x-2">
-            <ScoreBadge score={task.priority_score || 0} max={10} size="lg" />
+          ) : (
             <ScoreBadge score={task.progress} max={100} variant="progress" size="lg" />
-          </div>
-        )}
+          )}
+        </div>
         <div className="flex items-center space-x-2">
           <Button
             variant="ghost"
