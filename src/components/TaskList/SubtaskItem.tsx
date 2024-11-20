@@ -69,6 +69,11 @@ const SubtaskItem = ({
           </span>
         )}
         <div className="flex items-center space-x-4">
+          <NotesDropdown
+            subtaskId={subtask.id}
+            notes={subtask.notes || []}
+            onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
+          />
           {isEditing ? (
             <Slider
               value={[subtask.progress]}
@@ -86,11 +91,6 @@ const SubtaskItem = ({
           ) : (
             <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
           )}
-          <NotesDropdown
-            subtaskId={subtask.id}
-            notes={subtask.notes || []}
-            onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
-          />
         </div>
         {isEditing && onDelete && (
           <Button
