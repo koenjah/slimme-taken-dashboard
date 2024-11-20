@@ -1,11 +1,9 @@
 import { Subtask } from "@/types";
-import { Trash2, Plus, MessageCircle } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import ScoreBadge from "./Badges/ScoreBadge";
 import NotesDropdown from "./NotesDropdown";
 
@@ -22,39 +20,6 @@ const SubtaskItem = ({
   onUpdate,
   onDelete,
 }: SubtaskItemProps) => {
-  const { toast } = useToast();
-
-  const handleAddNote = async () => {
-    try {
-      const { data: note, error } = await supabase
-        .from('notes')
-        .insert([{
-          subtask_id: subtask.id,
-          content: "",
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      onUpdate({
-        ...subtask,
-        notes: [...(subtask.notes || []), note],
-      });
-
-      toast({
-        title: "Notitie toegevoegd",
-        description: "Een nieuwe notitie is aangemaakt.",
-      });
-    } catch (error) {
-      toast({
-        title: "Fout bij toevoegen",
-        description: "Er is een fout opgetreden bij het aanmaken van de notitie.",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
     <div className="flex items-center space-x-3">
       {isEditing ? (
@@ -104,16 +69,6 @@ const SubtaskItem = ({
           </span>
         )}
         <div className="flex items-center space-x-4">
-          {isEditing && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={handleAddNote}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          )}
           {isEditing ? (
             <Slider
               value={[subtask.progress]}
@@ -129,12 +84,7 @@ const SubtaskItem = ({
               className="w-24"
             />
           ) : (
-            <div className="flex items-center space-x-2">
-              {(subtask.notes?.length || 0) > 0 && (
-                <MessageCircle className="h-4 w-4 text-gray-400" />
-              )}
-              <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
-            </div>
+            <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
           )}
           <NotesDropdown
             subtaskId={subtask.id}
