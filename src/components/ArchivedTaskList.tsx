@@ -132,7 +132,7 @@ const ArchivedTaskList = () => {
 
   return (
     <div>
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {tasksWithCompletedSubtasks?.map((task) => (
           <TaskCard
             key={task.id}
@@ -162,7 +162,7 @@ const ArchivedTaskList = () => {
       </div>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="sm:max-w-[425px]">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Weet je zeker dat je dit {itemToDelete?.type === 'task' ? 'deze taak' : 'deze subtaak'} permanent wilt verwijderen?
@@ -172,7 +172,7 @@ const ArchivedTaskList = () => {
               {itemToDelete?.type === 'task' && ' Alle bijbehorende subtaken worden ook verwijderd.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="sm:justify-end">
             <AlertDialogCancel>Annuleren</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
