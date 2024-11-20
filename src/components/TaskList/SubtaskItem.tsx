@@ -22,7 +22,24 @@ const SubtaskItem = ({
 }: SubtaskItemProps) => {
   return (
     <div className="flex items-center space-x-3">
-      <ScoreBadge score={subtask.priority_score || 0} max={10} size="sm" />
+      {isEditing ? (
+        <Input
+          type="number"
+          min="0"
+          max="10"
+          value={subtask.priority_score || 0}
+          onChange={(e) => {
+            const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
+            onUpdate({
+              ...subtask,
+              priority_score: value,
+            });
+          }}
+          className="w-16 text-center"
+        />
+      ) : (
+        <ScoreBadge score={subtask.priority_score || 0} max={10} size="sm" />
+      )}
       <div className="flex-1 flex items-center space-x-3 p-2 bg-white/80 rounded-md shadow-sm border border-gray-100">
         <Checkbox
           checked={subtask.completed}
@@ -52,22 +69,6 @@ const SubtaskItem = ({
           </span>
         )}
         <div className="flex items-center space-x-4">
-          {isEditing ? (
-            <Input
-              type="number"
-              min="0"
-              max="10"
-              value={subtask.priority_score || 0}
-              onChange={(e) => {
-                const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
-                onUpdate({
-                  ...subtask,
-                  priority_score: value,
-                });
-              }}
-              className="w-16 text-center"
-            />
-          ) : null}
           {isEditing ? (
             <Slider
               value={[subtask.progress]}

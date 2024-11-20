@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Task } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import TaskCard from "./TaskList/TaskCard";
 import TaskListHeader from "./TaskList/TaskListHeader";
@@ -165,11 +164,11 @@ const TaskList = () => {
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
+                      {...provided.dragHandleProps}
                       className="mb-4"
                     >
                       <TaskCard
                         task={task}
-                        dragHandleProps={provided.dragHandleProps}
                         onTaskEdit={handleTaskUpdate}
                         onSubtaskUpdate={updateSubtaskMutation.mutate}
                         onSubtaskDelete={(subtaskId) => {
