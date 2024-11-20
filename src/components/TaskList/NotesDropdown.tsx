@@ -36,6 +36,7 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
 
       onNotesChange([...notes, note]);
       setNewNote("");
+      setIsOpen(false); // Close the dropdown after adding a note
       toast({
         title: "Notitie toegevoegd",
         description: "De notitie is succesvol opgeslagen.",
