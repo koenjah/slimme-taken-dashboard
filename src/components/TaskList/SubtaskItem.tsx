@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
 import ScoreBadge from "./Badges/ScoreBadge";
 import NotesDropdown from "./NotesDropdown";
 
@@ -23,6 +24,7 @@ const SubtaskItem = ({
   onDelete,
 }: SubtaskItemProps) => {
   const { toast } = useToast();
+  const [localName, setLocalName] = useState(subtask.name);
 
   const handleAddNote = async () => {
     try {
@@ -89,12 +91,15 @@ const SubtaskItem = ({
         />
         {isEditing ? (
           <Input
-            value={subtask.name}
-            onChange={(e) => {
-              onUpdate({
-                ...subtask,
-                name: e.target.value,
-              });
+            value={localName}
+            onChange={(e) => setLocalName(e.target.value)}
+            onBlur={() => {
+              if (localName !== subtask.name) {
+                onUpdate({
+                  ...subtask,
+                  name: localName,
+                });
+              }
             }}
             className="flex-1 min-w-[300px]"
           />
