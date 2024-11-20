@@ -17,9 +17,37 @@ interface NotesDropdownProps {
 const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [newNote, setNewNote] = useState("");
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Update dropdown position when opened
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      
+      // Calculate position to ensure the dropdown stays within viewport
+      const dropdownWidth = 500; // max-w-[500px]
+      let left = Math.max(0, buttonRect.left + window.scrollX - dropdownWidth + 32); // 32px offset from right edge
+      
+      // Ensure dropdown doesn't go off-screen to the left
+      if (left < 0) {
+        left = 0;
+      }
+      
+      // Ensure dropdown doesn't go off-screen to the right
+      if (left + dropdownWidth > viewportWidth) {
+        left = viewportWidth - dropdownWidth - 16; // 16px margin from viewport edge
+      }
+
+      setDropdownPosition({
+        top: buttonRect.bottom + window.scrollY + 8,
+        left: left,
+      });
+    }
+  }, [isOpen]);
 
   // Handle clicks outside dropdown
   useEffect(() => {
@@ -147,10 +175,10 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       {isOpen && (
         <div 
           ref={dropdownRef}
-          className="absolute z-50 w-full max-w-[500px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 overflow-y-auto overflow-x-hidden"
+          className="fixed z-50 w-[500px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 overflow-y-auto overflow-x-hidden"
           style={{ 
-            top: '100%',
-            right: '0',
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
             maxHeight: '60vh',
           }}
         >
