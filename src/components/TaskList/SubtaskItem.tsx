@@ -23,7 +23,6 @@ const SubtaskItem = ({
   dragHandleProps,
 }: SubtaskItemProps) => {
   const handleClick = (e: React.MouseEvent) => {
-    // Only trigger if not clicking the notes dropdown
     if (!(e.target as HTMLElement).closest('.notes-dropdown')) {
       // Your existing click handling logic
     }
@@ -49,7 +48,7 @@ const SubtaskItem = ({
       ) : (
         <ScoreBadge score={subtask.priority_score || 0} max={10} size="sm" />
       )}
-      <div className="flex-1 flex items-center space-x-3 p-2 bg-white/80 rounded-md shadow-sm border border-gray-100">
+      <div className="subtask-container flex-1 flex items-center space-x-3 p-2 bg-white/80 rounded-md shadow-sm border border-gray-100">
         <Checkbox
           checked={subtask.completed}
           onCheckedChange={(checked) => {

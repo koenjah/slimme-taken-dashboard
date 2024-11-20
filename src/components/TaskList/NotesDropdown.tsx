@@ -21,14 +21,18 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Position dropdown below the button
+  // Position dropdown below the subtask div
   useEffect(() => {
     if (isOpen && buttonRef.current) {
       const buttonRect = buttonRef.current.getBoundingClientRect();
-      setDropdownPosition({
-        top: buttonRect.bottom + window.scrollY + 8, // 8px offset
-        left: buttonRect.left + window.scrollX - (40 * 16 / 2) + (buttonRect.width / 2), // Center the 40rem dropdown
-      });
+      const subtaskDiv = buttonRef.current.closest('.subtask-container');
+      if (subtaskDiv) {
+        const subtaskRect = subtaskDiv.getBoundingClientRect();
+        setDropdownPosition({
+          top: subtaskRect.bottom + window.scrollY + 8, // 8px offset from bottom of subtask
+          left: subtaskRect.left + window.scrollX, // Align with left edge of subtask
+        });
+      }
     }
   }, [isOpen]);
 
@@ -109,7 +113,7 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent event from bubbling up
+    e.stopPropagation();
     setIsOpen(!isOpen);
   };
 
@@ -133,7 +137,7 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       {isOpen && (
         <div 
           ref={dropdownRef}
-          className="fixed z-50 w-[40rem] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4"
+          className="fixed z-50 w-full max-w-[40rem] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4"
           style={{ 
             top: `${dropdownPosition.top}px`,
             left: `${dropdownPosition.left}px`,
