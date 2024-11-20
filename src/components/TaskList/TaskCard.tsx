@@ -27,12 +27,20 @@ const TaskCard = ({
 }: TaskCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
-  const [editedSubtasks, setEditedSubtasks] = useState<Subtask[]>(task.subtasks || []);
+  const [editedSubtasks, setEditedSubtasks] = useState<Subtask[]>(
+    [...(task.subtasks || [])].sort((a, b) => (a.priority_score || 0) - (b.priority_score || 0))
+  );
   const [deletedSubtaskIds, setDeletedSubtaskIds] = useState<number[]>([]);
   const cardRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Handle click outside to save and exit edit mode
+  // Update editedSubtasks when task.subtasks changes
+  useEffect(() => {
+    setEditedSubtasks(
+      [...(task.subtasks || [])].sort((a, b) => (a.priority_score || 0) - (b.priority_score || 0))
+    );
+  }, [task.subtasks]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
@@ -71,12 +79,13 @@ const TaskCard = ({
 
   const handleAddSubtask = async () => {
     try {
+      const highestPriorityScore = Math.min(...editedSubtasks.map(s => s.priority_score || 0), 0);
       const { data: newSubtask, error } = await supabase
         .from('subtasks')
         .insert([{
           task_id: task.id,
           name: 'Nieuwe subtaak',
-          priority_score: Math.max(...editedSubtasks.map(s => s.priority_score || 0), 0) + 1,
+          priority_score: highestPriorityScore - 1,
           progress: 0,
           completed: false,
         }])
