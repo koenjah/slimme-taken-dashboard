@@ -94,7 +94,11 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       </Button>
 
       {isOpen && (
-        <div className="absolute z-10 left-0 top-[calc(100%+1rem)] w-[40rem] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4">
+        <div className="fixed z-50 w-[40rem] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4" style={{ 
+          top: 'calc(100% + 0.5rem)',
+          left: '50%',
+          transform: 'translateX(-50%)'
+        }}>
           {notes.map((note) => (
             <div key={note.id} className="group flex items-start space-x-2">
               <p className="flex-1 text-sm text-gray-700">{note.content}</p>
