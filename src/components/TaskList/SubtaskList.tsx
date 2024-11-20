@@ -26,7 +26,6 @@ const SubtaskList = ({
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    // Update priority scores: lower index = lower number = higher priority
     const updatedItems = items.map((item, index) => ({
       ...item,
       priority_score: index + 1,

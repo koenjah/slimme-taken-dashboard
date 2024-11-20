@@ -10,6 +10,7 @@ import NotesDropdown from "./NotesDropdown";
 interface SubtaskItemProps {
   subtask: Subtask;
   isEditing: boolean;
+  dragHandleProps?: any;
   onUpdate: (subtask: Subtask) => void;
   onDelete?: (subtaskId: number) => void;
 }
@@ -17,6 +18,7 @@ interface SubtaskItemProps {
 const SubtaskItem = ({
   subtask,
   isEditing,
+  dragHandleProps,
   onUpdate,
   onDelete,
 }: SubtaskItemProps) => {
@@ -99,6 +101,7 @@ const SubtaskItem = ({
               size="icon"
               onClick={() => onDelete(subtask.id)}
               className="hover:bg-red-50 hover:text-red-500 transition-all"
+              {...dragHandleProps}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
