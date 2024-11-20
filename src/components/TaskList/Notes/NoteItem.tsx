@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Note } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Pencil, Trash2, Check, X } from "lucide-react";
+import { Check, X, Pencil, Trash2 } from "lucide-react";
 
 interface NoteItemProps {
   note: Note;
@@ -31,7 +31,7 @@ const NoteItem = ({ note, onEdit, onDelete }: NoteItemProps) => {
           <Textarea
             value={editedContent}
             onChange={(e) => setEditedContent(e.target.value)}
-            className="min-h-[60px] text-sm resize-none leading-tight"
+            className="min-h-[60px] text-sm resize-none"
             onClick={(e) => e.stopPropagation()}
           />
           <div className="flex space-x-2">
@@ -63,8 +63,8 @@ const NoteItem = ({ note, onEdit, onDelete }: NoteItemProps) => {
         </div>
       ) : (
         <>
-          <div className="flex-1 max-h-[200px] overflow-y-auto leading-tight">
-            <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">
+          <div className="flex-1 max-h-[200px] overflow-y-auto">
+            <p className="text-sm text-gray-700 whitespace-pre-wrap break-words pr-2">
               {note.content}
             </p>
           </div>
