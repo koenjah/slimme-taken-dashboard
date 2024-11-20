@@ -1,5 +1,5 @@
 import { Subtask } from "@/types";
-import { Trash2, MessageSquare } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -61,24 +61,30 @@ const SubtaskItem = ({
           className="data-[state=checked]:bg-primary"
         />
         {isEditing ? (
-          <div className="flex-1 flex items-center space-x-3">
-            <Input
-              value={subtask.name}
-              onChange={(e) => {
-                onUpdate({
-                  ...subtask,
-                  name: e.target.value,
-                });
-              }}
-              className="flex-1"
+          <Input
+            value={subtask.name}
+            onChange={(e) => {
+              onUpdate({
+                ...subtask,
+                name: e.target.value,
+              });
+            }}
+            className="flex-1"
+          />
+        ) : (
+          <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
+            {subtask.name}
+          </span>
+        )}
+        <div className="flex items-center space-x-4">
+          <div className="notes-dropdown">
+            <NotesDropdown
+              subtaskId={subtask.id}
+              notes={subtask.notes || []}
+              onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
             />
-            <div className="notes-dropdown">
-              <NotesDropdown
-                subtaskId={subtask.id}
-                notes={subtask.notes || []}
-                onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
-              />
-            </div>
+          </div>
+          {isEditing ? (
             <Slider
               value={[subtask.progress]}
               onValueChange={(value) => {
@@ -92,24 +98,10 @@ const SubtaskItem = ({
               step={1}
               className="w-24"
             />
-          </div>
-        ) : (
-          <>
-            <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
-              {subtask.name}
-            </span>
-            <div className="flex items-center space-x-4">
-              <div className="notes-dropdown">
-                <NotesDropdown
-                  subtaskId={subtask.id}
-                  notes={subtask.notes || []}
-                  onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
-                />
-              </div>
-              <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
-            </div>
-          </>
-        )}
+          ) : (
+            <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
+          )}
+        </div>
         {isEditing && onDelete && (
           <Button
             variant="ghost"
