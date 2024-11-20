@@ -99,6 +99,7 @@ const TaskCardHeader = ({
           )}
         </div>
         <div className="flex items-center space-x-2">
+          {/* Notes dropdown is now always visible, using editedTask when editing */}
           <NotesDropdown
             taskId={task.id}
             notes={isEditing ? editedTask.notes || [] : task.notes || []}
