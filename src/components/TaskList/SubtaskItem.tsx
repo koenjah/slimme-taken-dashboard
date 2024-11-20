@@ -72,21 +72,6 @@ const SubtaskItem = ({
               }}
               className="flex-1"
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-[#154273]/10 text-[#154273]"
-              onClick={(e) => {
-                e.stopPropagation();
-                // Find and trigger the dropdown's internal button
-                const dropdownTrigger = e.currentTarget.nextElementSibling?.querySelector('[role="button"]');
-                if (dropdownTrigger instanceof HTMLElement) {
-                  dropdownTrigger.click();
-                }
-              }}
-            >
-              <MessageSquare className="h-4 w-4" />
-            </Button>
             <div className="notes-dropdown">
               <NotesDropdown
                 subtaskId={subtask.id}
