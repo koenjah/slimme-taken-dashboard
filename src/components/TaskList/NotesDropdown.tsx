@@ -1,11 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Note } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import NoteItem from "./Notes/NoteItem";
-import NewNoteForm from "./Notes/NewNoteForm";
+import NotesButton from "./Notes/NotesButton";
+import NotesDropdownContent from "./Notes/NotesDropdownContent";
 
 interface NotesDropdownProps {
   taskId?: number;
@@ -18,15 +16,14 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
   const [isOpen, setIsOpen] = useState(false);
   const [newNote, setNewNote] = useState("");
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Update dropdown position when scrolling or opening
   const updatePosition = () => {
-    if (isOpen && buttonRef.current) {
-      const buttonRect = buttonRef.current.getBoundingClientRect();
-      const subtaskDiv = buttonRef.current.closest('.subtask-container');
+    if (isOpen && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const subtaskDiv = containerRef.current.closest('.subtask-container');
       if (subtaskDiv) {
         const subtaskRect = subtaskDiv.getBoundingClientRect();
         setDropdownPosition({
@@ -39,7 +36,6 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
 
   useEffect(() => {
     updatePosition();
-    // Update position on scroll
     window.addEventListener('scroll', updatePosition, true);
     return () => window.removeEventListener('scroll', updatePosition, true);
   }, [isOpen]);
@@ -49,8 +45,8 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       if (
         dropdownRef.current && 
         !dropdownRef.current.contains(event.target as Node) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node)
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -145,6 +141,7 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
   };
 
   const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     setIsOpen(!isOpen);
   };
@@ -152,19 +149,12 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
   if (!isOpen && notes.length === 0) return null;
 
   return (
-    <div className="relative">
-      <Button
-        ref={buttonRef}
-        variant="ghost"
-        size="sm"
+    <div className="relative" ref={containerRef}>
+      <NotesButton
+        notesCount={notes.length}
+        isOpen={isOpen}
         onClick={handleClick}
-        className={`text-gray-500 hover:text-primary ${isOpen ? 'text-primary' : ''}`}
-      >
-        <MessageSquare className="h-4 w-4" />
-        {notes.length > 0 && (
-          <span className="ml-1 text-xs">{notes.length}</span>
-        )}
-      </Button>
+      />
 
       {isOpen && (
         <div 
@@ -175,23 +165,13 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
             left: `${dropdownPosition.left}px`,
           }}
         >
-          <div 
-            className="space-y-2 max-h-[400px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400"
-          >
-            {notes.map((note) => (
-              <NoteItem
-                key={note.id}
-                note={note}
-                onEdit={handleEditNote}
-                onDelete={handleDeleteNote}
-              />
-            ))}
-          </div>
-          
-          <NewNoteForm
+          <NotesDropdownContent
+            notes={notes}
             newNote={newNote}
             onNewNoteChange={setNewNote}
             onAddNote={handleAddNote}
+            onEditNote={handleEditNote}
+            onDeleteNote={handleDeleteNote}
           />
         </div>
       )}
