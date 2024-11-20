@@ -72,6 +72,11 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
     }
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event from bubbling up
+    setIsOpen(!isOpen);
+  };
+
   if (!isOpen && notes.length === 0) return null;
 
   return (
@@ -79,7 +84,7 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleClick}
         className={`text-gray-500 hover:text-primary ${isOpen ? 'text-primary' : ''}`}
       >
         <MessageSquare className="h-4 w-4" />
@@ -89,14 +94,17 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       </Button>
 
       {isOpen && (
-        <div className="absolute z-10 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4">
+        <div className="absolute z-10 left-0 top-[calc(100%+1rem)] w-[40rem] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4">
           {notes.map((note) => (
             <div key={note.id} className="group flex items-start space-x-2">
               <p className="flex-1 text-sm text-gray-700">{note.content}</p>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleDeleteNote(note.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteNote(note.id);
+                }}
                 className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-600 hover:bg-red-50"
               >
                 ×
@@ -110,9 +118,13 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
               onChange={(e) => setNewNote(e.target.value)}
               placeholder="Voeg een notitie toe..."
               className="min-h-[60px] text-sm"
+              onClick={(e) => e.stopPropagation()}
             />
             <Button
-              onClick={handleAddNote}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddNote();
+              }}
               disabled={!newNote.trim()}
               size="sm"
               className="w-full"

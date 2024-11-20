@@ -12,6 +12,7 @@ interface SubtaskItemProps {
   isEditing: boolean;
   onUpdate: (subtask: Subtask) => void;
   onDelete?: (subtaskId: number) => void;
+  dragHandleProps?: any;
 }
 
 const SubtaskItem = ({
@@ -19,9 +20,17 @@ const SubtaskItem = ({
   isEditing,
   onUpdate,
   onDelete,
+  dragHandleProps,
 }: SubtaskItemProps) => {
+  const handleClick = (e: React.MouseEvent) => {
+    // Only trigger if not clicking the notes dropdown
+    if (!(e.target as HTMLElement).closest('.notes-dropdown')) {
+      // Your existing click handling logic
+    }
+  };
+
   return (
-    <div className="flex items-center space-x-3">
+    <div className="flex items-center space-x-3" onClick={handleClick}>
       {isEditing ? (
         <Input
           type="number"
@@ -69,11 +78,13 @@ const SubtaskItem = ({
           </span>
         )}
         <div className="flex items-center space-x-4">
-          <NotesDropdown
-            subtaskId={subtask.id}
-            notes={subtask.notes || []}
-            onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
-          />
+          <div className="notes-dropdown">
+            <NotesDropdown
+              subtaskId={subtask.id}
+              notes={subtask.notes || []}
+              onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
+            />
+          </div>
           {isEditing ? (
             <Slider
               value={[subtask.progress]}
