@@ -103,7 +103,7 @@ const SubtaskItem = ({
             {subtask.name}
           </span>
         )}
-        <div className="flex items-center justify-end min-w-[250px] relative pr-10">
+        <div className="flex items-center justify-end min-w-[250px] relative">
           {isEditing && (!subtask.notes || subtask.notes.length === 0) && (
             <Button
               variant="ghost"
@@ -114,7 +114,7 @@ const SubtaskItem = ({
               <MessageSquare className="h-4 w-4" />
             </Button>
           )}
-          <div className="flex items-center gap-2.5 absolute right-10">
+          <div className="flex items-center gap-2.5 mr-10">
             {(subtask.notes?.length ?? 0) > 0 && (
               <NotesDropdown
                 subtaskId={subtask.id}
@@ -125,30 +125,32 @@ const SubtaskItem = ({
             <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
           </div>
           {isEditing ? (
-            <Slider
-              value={[subtask.progress]}
-              onValueChange={(value) => {
-                onUpdate({
-                  ...subtask,
-                  progress: value[0],
-                  completed: value[0] === 100,
-                });
-              }}
-              max={100}
-              step={1}
-              className="w-24"
-            />
+            <>
+              <Slider
+                value={[subtask.progress]}
+                onValueChange={(value) => {
+                  onUpdate({
+                    ...subtask,
+                    progress: value[0],
+                    completed: value[0] === 100,
+                  });
+                }}
+                max={100}
+                step={1}
+                className="w-24"
+              />
+              {onDelete && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onDelete(subtask.id)}
+                  className="hover:bg-red-50 hover:text-red-500 transition-all ml-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </>
           ) : null}
-          {isEditing && onDelete && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDelete(subtask.id)}
-              className="hover:bg-red-50 hover:text-red-500 transition-all"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
         </div>
       </div>
     </div>
