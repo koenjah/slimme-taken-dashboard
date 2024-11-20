@@ -38,11 +38,32 @@ const SubtaskList = ({
     onSubtasksChange(updatedItems);
   };
 
+  const handleSubtaskComplete = (subtask: Subtask, checked: boolean) => {
+    const updatedSubtask = {
+      ...subtask,
+      completed: checked,
+      progress: checked ? 100 : 0,
+      archived: checked, // Set archived to true when completed
+    };
+
+    if (!isEditing) {
+      onSubtaskUpdate(updatedSubtask);
+    } else {
+      onSubtasksChange(
+        editedSubtasks.map(s => s.id === subtask.id ? updatedSubtask : s)
+      );
+    }
+  };
+
   return (
     <DragDropContext onDragEnd={handleSubtaskDragEnd}>
       <Droppable droppableId={`subtasks-${taskId}`} isDropDisabled={!isEditing}>
         {(provided) => (
-          <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+          <div 
+            {...provided.droppableProps} 
+            ref={provided.innerRef} 
+            className={`space-y-2 ${!isEditing ? 'select-none' : ''}`}
+          >
             {editedSubtasks.map((subtask, index) => (
               <Draggable 
                 key={subtask.id} 
@@ -57,7 +78,7 @@ const SubtaskList = ({
                     className={`
                       flex items-center space-x-3 p-2 bg-white rounded-md shadow-sm border border-gray-100 
                       transition-all group
-                      ${isEditing ? 'hover:border-[#154273]/20' : 'pointer-events-none select-none'}
+                      ${isEditing ? 'hover:border-[#154273]/20' : 'pointer-events-none'}
                     `}
                   >
                     {isEditing && (
@@ -67,21 +88,7 @@ const SubtaskList = ({
                     )}
                     <Checkbox 
                       checked={subtask.completed}
-                      onCheckedChange={(checked) => {
-                        const updatedSubtask = {
-                          ...subtask,
-                          completed: checked as boolean,
-                          progress: checked ? 100 : 0,
-                          archived: checked as boolean, // Add archived status when completed
-                        };
-                        if (!isEditing) {
-                          onSubtaskUpdate(updatedSubtask);
-                        } else {
-                          onSubtasksChange(
-                            editedSubtasks.map(s => s.id === subtask.id ? updatedSubtask : s)
-                          );
-                        }
-                      }}
+                      onCheckedChange={(checked) => handleSubtaskComplete(subtask, checked as boolean)}
                       className="data-[state=checked]:bg-[#154273]"
                       tabIndex={-1}
                       aria-hidden={!isEditing}
@@ -114,7 +121,7 @@ const SubtaskList = ({
                                   ...s, 
                                   progress: value[0], 
                                   completed: value[0] === 100,
-                                  archived: value[0] === 100 // Add archived status when progress is 100%
+                                  archived: value[0] === 100
                                 } : s
                               )
                             );

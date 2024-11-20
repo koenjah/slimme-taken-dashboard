@@ -32,9 +32,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
 };
 
 export const fetchArchivedTasks = async (): Promise<Task[]> => {
-  // Fetch all tasks that either:
-  // 1. Are archived themselves
-  // 2. Have archived subtasks
+  // First, fetch all tasks
   const { data: allTasks, error: tasksError } = await supabase
     .from('tasks')
     .select('*')
@@ -44,6 +42,7 @@ export const fetchArchivedTasks = async (): Promise<Task[]> => {
 
   const tasksWithSubtasks = await Promise.all(
     (allTasks || []).map(async (task) => {
+      // For each task, fetch both archived and non-archived subtasks
       const { data: subtasks, error: subtasksError } = await supabase
         .from('subtasks')
         .select('*')
@@ -59,9 +58,9 @@ export const fetchArchivedTasks = async (): Promise<Task[]> => {
     })
   );
 
-  // Filter tasks to only include those that are archived or have archived subtasks
+  // Return tasks that are either archived themselves or have archived subtasks
   return tasksWithSubtasks.filter(task => 
-    task.archived || task.subtasks.some(subtask => subtask.archived)
+    task.archived || (task.subtasks && task.subtasks.some(subtask => subtask.archived))
   );
 };
 
