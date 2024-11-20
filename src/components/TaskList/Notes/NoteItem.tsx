@@ -25,7 +25,7 @@ const NoteItem = ({ note, onEdit, onDelete }: NoteItemProps) => {
   };
 
   return (
-    <div className="group flex items-start space-x-2 p-2 rounded-md hover:bg-gray-50">
+    <div className="group relative flex flex-col space-y-2 p-2 rounded-md hover:bg-gray-50">
       {isEditing ? (
         <div className="flex-1 space-y-2">
           <Textarea
@@ -63,7 +63,7 @@ const NoteItem = ({ note, onEdit, onDelete }: NoteItemProps) => {
         </div>
       ) : (
         <>
-          <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
             <Button
               variant="ghost"
               size="sm"
