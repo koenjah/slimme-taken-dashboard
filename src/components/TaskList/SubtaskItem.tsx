@@ -96,14 +96,14 @@ const SubtaskItem = ({
                 name: e.target.value,
               });
             }}
-            className="flex-1 min-w-[200px]"
+            className="flex-1 min-w-[300px]"
           />
         ) : (
-          <span className={`flex-1 min-w-[200px] ${subtask.completed ? 'line-through' : ''}`}>
+          <span className={`flex-1 min-w-[300px] ${subtask.completed ? 'line-through' : ''}`}>
             {subtask.name}
           </span>
         )}
-        <div className="flex items-center space-x-4 min-w-[200px] justify-end">
+        <div className="flex items-center space-x-4 min-w-[250px] justify-end">
           {isEditing && (!subtask.notes || subtask.notes.length === 0) && (
             <Button
               variant="ghost"
