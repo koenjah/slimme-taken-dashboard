@@ -114,6 +114,14 @@ const SubtaskItem = ({
               <Plus className="h-4 w-4" />
             </Button>
           )}
+          <div className="flex items-center space-x-2">
+            <NotesDropdown
+              subtaskId={subtask.id}
+              notes={subtask.notes || []}
+              onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
+            />
+            <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
+          </div>
           {isEditing ? (
             <Slider
               value={[subtask.progress]}
@@ -128,30 +136,18 @@ const SubtaskItem = ({
               step={1}
               className="w-24"
             />
-          ) : (
-            <div className="flex items-center space-x-2">
-              {(subtask.notes?.length || 0) > 0 && (
-                <MessageCircle className="h-4 w-4 text-gray-400" />
-              )}
-              <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
-            </div>
+          ) : null}
+          {isEditing && onDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(subtask.id)}
+              className="hover:bg-red-50 hover:text-red-500 transition-all"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           )}
-          <NotesDropdown
-            subtaskId={subtask.id}
-            notes={subtask.notes || []}
-            onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
-          />
         </div>
-        {isEditing && onDelete && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(subtask.id)}
-            className="hover:bg-red-50 hover:text-red-500 transition-all"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        )}
       </div>
     </div>
   );

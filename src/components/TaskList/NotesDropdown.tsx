@@ -115,8 +115,8 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       </Button>
 
       {isOpen && (
-        <div className="absolute z-10 -left-[300px] mt-[-32px] w-[280px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4">
-          <div className="max-h-[300px] overflow-y-auto space-y-4">
+        <div className="absolute z-10 left-[-24px] mt-2 w-[400px] bg-white rounded-lg shadow-lg border border-gray-100 p-4 space-y-4">
+          <div className="max-h-[400px] overflow-y-auto space-y-4">
             {notes.map((note) => (
               <div key={note.id} className="space-y-2">
                 {editingNote?.id === note.id ? (
@@ -124,7 +124,8 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
                     <Textarea
                       value={editingNote.content}
                       onChange={(e) => setEditingNote({ ...editingNote, content: e.target.value })}
-                      className="min-h-[60px] text-sm"
+                      className="min-h-[60px] text-sm w-full resize-none"
+                      style={{ maxHeight: '200px', overflowY: 'auto', overflowX: 'hidden', wordWrap: 'break-word' }}
                     />
                     <div className="flex justify-end space-x-2">
                       <Button
@@ -145,7 +146,9 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
                 ) : (
                   <div className="group bg-gray-50 p-3 rounded-md">
                     <div className="flex justify-between items-start">
-                      <p className="text-sm text-gray-700 flex-1">{note.content}</p>
+                      <p className="text-sm text-gray-700 flex-1 whitespace-pre-wrap break-words" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                        {note.content}
+                      </p>
                       <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
@@ -177,7 +180,8 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
               placeholder="Voeg een notitie toe..."
-              className="min-h-[80px] text-sm"
+              className="min-h-[80px] text-sm w-full resize-none"
+              style={{ maxHeight: '200px', overflowY: 'auto', overflowX: 'hidden', wordWrap: 'break-word' }}
             />
             <Button
               onClick={handleAddNote}
