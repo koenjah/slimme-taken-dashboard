@@ -63,11 +63,6 @@ const NoteItem = ({ note, onEdit, onDelete }: NoteItemProps) => {
         </div>
       ) : (
         <>
-          <div className="flex-1 max-h-[200px] overflow-y-auto pr-2">
-            <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">
-              {note.content}
-            </p>
-          </div>
           <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <Button
               variant="ghost"
@@ -91,6 +86,11 @@ const NoteItem = ({ note, onEdit, onDelete }: NoteItemProps) => {
             >
               <Trash2 className="h-4 w-4" />
             </Button>
+          </div>
+          <div className="flex-1 max-h-[200px] overflow-y-auto">
+            <p className="text-sm text-gray-700 whitespace-pre-wrap break-words pr-2">
+              {note.content}
+            </p>
           </div>
         </>
       )}
