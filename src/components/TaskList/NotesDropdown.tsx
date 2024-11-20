@@ -22,6 +22,7 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
+  // Update dropdown position when opened
   useEffect(() => {
     if (isOpen && buttonRef.current) {
       const buttonRect = buttonRef.current.getBoundingClientRect();
@@ -36,6 +37,7 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
     }
   }, [isOpen]);
 
+  // Handle clicks outside dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -161,13 +163,15 @@ const NotesDropdown = ({ taskId, subtaskId, notes, onNotesChange }: NotesDropdow
       {isOpen && (
         <div 
           ref={dropdownRef}
-          className="fixed z-50 w-full max-w-[40rem] bg-white rounded-lg shadow-lg border border-gray-100 p-4 max-h-[80vh] overflow-y-auto"
+          className="fixed z-50 w-full max-w-[40rem] bg-white rounded-lg shadow-lg border border-gray-100 p-4"
           style={{ 
             top: `${dropdownPosition.top}px`,
             left: `${dropdownPosition.left}px`,
+            maxHeight: '60vh',
+            overflowY: 'auto',
           }}
         >
-          <div className="space-y-4 max-h-[calc(80vh-120px)] overflow-y-auto">
+          <div className="space-y-2 pr-2">
             {notes.map((note) => (
               <NoteItem
                 key={note.id}
