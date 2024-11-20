@@ -78,10 +78,10 @@ const SubtaskItem = ({
               className="hover:bg-[#154273]/10 text-[#154273]"
               onClick={(e) => {
                 e.stopPropagation();
-                const dropdown = e.currentTarget.nextElementSibling;
-                if (dropdown) {
-                  const button = dropdown.querySelector('button');
-                  if (button) button.click();
+                // Find and trigger the dropdown's internal button
+                const dropdownTrigger = e.currentTarget.nextElementSibling?.querySelector('[role="button"]');
+                if (dropdownTrigger instanceof HTMLElement) {
+                  dropdownTrigger.click();
                 }
               }}
             >
