@@ -63,7 +63,7 @@ const NoteItem = ({ note, onEdit, onDelete }: NoteItemProps) => {
         </div>
       ) : (
         <>
-          <div className="absolute top-2 right-2 flex space-x-1 bg-white rounded-md p-1 z-10">
+          <div className="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-md p-1 z-10">
             <Button
               variant="ghost"
               size="sm"
