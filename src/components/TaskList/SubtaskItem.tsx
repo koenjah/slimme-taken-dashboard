@@ -28,6 +28,9 @@ const SubtaskItem = ({
     }
   };
 
+  // Notes count for display
+  const notesCount = subtask.notes?.length || 0;
+
   return (
     <div className="flex items-center space-x-3" onClick={handleClick}>
       {isEditing ? (
@@ -72,13 +75,13 @@ const SubtaskItem = ({
               }}
               className="flex-1"
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-[#154273]/10 text-[#154273]"
-            >
-              <MessageSquare className="h-4 w-4" />
-            </Button>
+            <div className="notes-dropdown">
+              <NotesDropdown
+                subtaskId={subtask.id}
+                notes={subtask.notes || []}
+                onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
+              />
+            </div>
             <Slider
               value={[subtask.progress]}
               onValueChange={(value) => {
