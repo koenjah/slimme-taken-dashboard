@@ -20,22 +20,28 @@ const SubtaskItem = ({
 }: SubtaskItemProps) => {
   // Local state for editing
   const [localName, setLocalName] = useState(subtask.name);
+  const [localProgress, setLocalProgress] = useState(subtask.progress);
 
   // Sync local state when subtask prop changes
   useEffect(() => {
     setLocalName(subtask.name);
-  }, [subtask.name]);
+    setLocalProgress(subtask.progress);
+  }, [subtask.name, subtask.progress]);
 
   const handleSave = () => {
-    if (localName !== subtask.name) {
+    if (localName !== subtask.name || localProgress !== subtask.progress) {
       onUpdate({
         ...subtask,
         name: localName,
+        progress: localProgress,
+        completed: localProgress === 100,
       });
     }
   };
 
   const handleProgressUpdate = (progress: number) => {
+    setLocalProgress(progress);
+    // Update immediately for progress changes
     onUpdate({
       ...subtask,
       progress,
@@ -72,7 +78,7 @@ const SubtaskItem = ({
         <div className="flex items-center justify-end min-w-[100px]">
           <Input
             type="number"
-            value={subtask.progress}
+            value={localProgress}
             onChange={(e) => {
               const progress = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
               handleProgressUpdate(progress);
