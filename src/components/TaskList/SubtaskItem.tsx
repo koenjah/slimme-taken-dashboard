@@ -54,7 +54,7 @@ const SubtaskItem = ({
         </span>
       )}
 
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center gap-4">
         <NotesDropdown
           subtaskId={subtask.id}
           notes={subtask.notes || []}
