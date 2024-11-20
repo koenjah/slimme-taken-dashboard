@@ -42,7 +42,7 @@ const ScoreBadge = ({ score, max, variant = "priority", className }: ScoreBadgeP
   return (
     <div
       className={cn(
-        "flex items-center justify-center w-7 h-7 rounded-full text-sm font-medium",
+        "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium",
         className
       )}
       style={{ 
@@ -50,7 +50,7 @@ const ScoreBadge = ({ score, max, variant = "priority", className }: ScoreBadgeP
         color: textColor,
       }}
     >
-      {score}
+      {isProgress ? `${score}%` : score}
     </div>
   );
 };

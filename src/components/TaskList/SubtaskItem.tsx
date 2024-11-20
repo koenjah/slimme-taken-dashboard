@@ -36,10 +36,10 @@ const SubtaskItem = ({
       )}
       <Checkbox 
         checked={subtask.completed}
-        onCheckedChange={(checked) => 
+        onCheckedChange={(checked: boolean) => 
           onUpdate({
             ...subtask,
-            completed: checked as boolean,
+            completed: checked,
             progress: checked ? 100 : 0,
             archived: checked,
           })
@@ -51,38 +51,10 @@ const SubtaskItem = ({
       <div className="flex items-center space-x-3 flex-1">
         <div className="flex items-center space-x-2">
           <ScoreBadge score={subtask.priority_score || 0} max={10} />
-          <ScoreBadge 
-            score={subtask.progress} 
-            max={100} 
-            variant="progress"
-          />
-        </div>
-        {isEditing ? (
-          <div className="space-y-2 flex-1">
-            <Input
-              value={subtask.name}
-              onChange={(e) => onUpdate({ ...subtask, name: e.target.value })}
-            />
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500">Prioriteit:</span>
-              <Input
-                type="number"
-                min="0"
-                max="10"
-                value={subtask.priority_score || 0}
-                onChange={(e) => {
-                  const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
-                  onUpdate({ ...subtask, priority_score: value });
-                }}
-                className="w-20"
-              />
-            </div>
-          </div>
-        ) : (
           <span className={`text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
             {subtask.name}
           </span>
-        )}
+        </div>
       </div>
       {isEditing && (
         <div className="flex items-center space-x-4 min-w-[200px]">
@@ -100,6 +72,7 @@ const SubtaskItem = ({
             step={1}
             className="flex-1"
           />
+          <ScoreBadge score={subtask.progress} max={100} variant="progress" className="ml-2" />
           {onDelete && (
             <Button
               variant="ghost"
