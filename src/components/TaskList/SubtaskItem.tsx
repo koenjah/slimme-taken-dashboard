@@ -21,85 +21,87 @@ const SubtaskItem = ({
   onDelete,
 }: SubtaskItemProps) => {
   return (
-    <div className="flex items-center space-x-3 p-2 bg-white/80 rounded-md shadow-sm border border-gray-100">
+    <div className="flex items-center space-x-3">
       <ScoreBadge score={subtask.priority_score || 0} max={10} size="sm" />
-      <Checkbox
-        checked={subtask.completed}
-        onCheckedChange={(checked) => {
-          onUpdate({
-            ...subtask,
-            completed: checked as boolean,
-            progress: checked ? 100 : 0,
-          });
-        }}
-        className="data-[state=checked]:bg-primary"
-      />
-      {isEditing ? (
-        <Input
-          value={subtask.name}
-          onChange={(e) => {
+      <div className="flex-1 flex items-center space-x-3 p-2 bg-white/80 rounded-md shadow-sm border border-gray-100">
+        <Checkbox
+          checked={subtask.completed}
+          onCheckedChange={(checked) => {
             onUpdate({
               ...subtask,
-              name: e.target.value,
+              completed: checked as boolean,
+              progress: checked ? 100 : 0,
             });
           }}
-          className="flex-1"
+          className="data-[state=checked]:bg-primary"
         />
-      ) : (
-        <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
-          {subtask.name}
-        </span>
-      )}
-      <div className="flex items-center space-x-4">
         {isEditing ? (
           <Input
-            type="number"
-            min="0"
-            max="10"
-            value={subtask.priority_score || 0}
+            value={subtask.name}
             onChange={(e) => {
-              const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
               onUpdate({
                 ...subtask,
-                priority_score: value,
+                name: e.target.value,
               });
             }}
-            className="w-16 text-center"
-          />
-        ) : null}
-        {isEditing ? (
-          <Slider
-            value={[subtask.progress]}
-            onValueChange={(value) => {
-              onUpdate({
-                ...subtask,
-                progress: value[0],
-                completed: value[0] === 100,
-              });
-            }}
-            max={100}
-            step={1}
-            className="w-24"
+            className="flex-1"
           />
         ) : (
-          <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
+          <span className={`flex-1 text-gray-700 ${subtask.completed ? 'line-through' : ''}`}>
+            {subtask.name}
+          </span>
         )}
-        <NotesDropdown
-          subtaskId={subtask.id}
-          notes={subtask.notes || []}
-          onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
-        />
+        <div className="flex items-center space-x-4">
+          {isEditing ? (
+            <Input
+              type="number"
+              min="0"
+              max="10"
+              value={subtask.priority_score || 0}
+              onChange={(e) => {
+                const value = Math.min(10, Math.max(0, parseInt(e.target.value) || 0));
+                onUpdate({
+                  ...subtask,
+                  priority_score: value,
+                });
+              }}
+              className="w-16 text-center"
+            />
+          ) : null}
+          {isEditing ? (
+            <Slider
+              value={[subtask.progress]}
+              onValueChange={(value) => {
+                onUpdate({
+                  ...subtask,
+                  progress: value[0],
+                  completed: value[0] === 100,
+                });
+              }}
+              max={100}
+              step={1}
+              className="w-24"
+            />
+          ) : (
+            <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
+          )}
+          <NotesDropdown
+            subtaskId={subtask.id}
+            notes={subtask.notes || []}
+            onNotesChange={(notes) => onUpdate({ ...subtask, notes })}
+          />
+        </div>
+        {isEditing && onDelete && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDelete(subtask.id)}
+            className="hover:bg-red-50 hover:text-red-500 transition-all"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
-      {isEditing && onDelete && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onDelete(subtask.id)}
-          className="hover:bg-red-50 hover:text-red-500 transition-all"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      )}
     </div>
   );
 };
