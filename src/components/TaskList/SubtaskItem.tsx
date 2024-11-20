@@ -1,5 +1,5 @@
 import { Subtask } from "@/types";
-import { Trash2, MessageSquare } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -92,6 +92,16 @@ const SubtaskItem = ({
               step={1}
               className="w-24"
             />
+            {onDelete && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onDelete(subtask.id)}
+                className="hover:bg-red-50 hover:text-red-500 transition-all"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         ) : (
           <>
@@ -109,16 +119,6 @@ const SubtaskItem = ({
               <span className="text-sm font-medium text-gray-600">{subtask.progress}%</span>
             </div>
           </>
-        )}
-        {isEditing && onDelete && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(subtask.id)}
-            className="hover:bg-red-50 hover:text-red-500 transition-all"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
         )}
       </div>
     </div>
